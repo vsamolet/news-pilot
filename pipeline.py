@@ -8,25 +8,31 @@
    (высокое пересечение слов в заголовках), используется только одна запись —
    от источника с более высоким приоритетом (порядок в SOURCES), остальные
    отбрасываются как дубликаты темы (см. deduplicate_by_topic).
-4. Проверяет месячный лимит публикаций (MONTHLY_ARTICLE_LIMIT, см. publish_log.json)
-   — если лимит на текущий календарный месяц исчерпан, проход останавливается
-   ДО обращения к YandexGPT/Unsplash, чтобы не тратить бюджет сверх плана.
-5. Скачивает страницу статьи по ссылке из RSS и извлекает полный текст
-   первоисточника через trafilatura (если не получилось — откатывается
-   на короткий анонс из RSS).
-6. Пересказывает новость через YandexGPT API (строгий JSON-ответ, развёрнутая
-   заметка 3-5 абзацев с атрибуцией конкретного источника).
+4. Проверяет лимиты публикаций — месячный (MONTHLY_ARTICLE_LIMIT, см.
+   publish_log.json) и за один проход (MAX_ARTICLES_PER_RUN, по умолчанию 1 —
+   рассчитан на cron из GitHub Actions с 3 запусками в день, см.
+   .github/workflows/news-cron.yml). При исчерпании месячного лимита проход
+   останавливается ДО обращения к YandexGPT/Unsplash.
+5. Скачивает страницу статьи по ссылке из RSS (с браузерным User-Agent) и
+   извлекает полный текст первоисточника через trafilatura. Если текста
+   меньше MIN_FULL_TEXT_CHARS — новость пропускается целиком (без отката на
+   анонс из RSS: короткий анонс, растянутый моделью до "нормы" объёма,
+   порождал статьи ни о чём — см. ThinSourceError).
+6. Пересказывает новость через YandexGPT API (строгий JSON-ответ, сухой
+   фактологический рерайт без домыслов, с атрибуцией конкретного источника).
 7. Ищет и скачивает иллюстрацию через Unsplash API, конвертирует в WebP.
 8. Сохраняет готовую статью в src/content/news/<slug>.md с фронтматтером,
    совместимым со схемой контент-коллекции Astro-сайта.
 
 Запуск:
-    python pipeline.py                    # один проход: обработать все новые записи и выйти
+    python pipeline.py                    # один проход: до MAX_ARTICLES_PER_RUN новых статей и выйти
     python pipeline.py --loop              # непрерывно, проверка каждые 15 минут (по умолчанию)
     python pipeline.py --loop --interval 300   # тот же цикл, но раз в 5 минут
     python pipeline.py --monthly-limit 50      # свой месячный лимит статей вместо 100 по умолчанию
+    python pipeline.py --max-per-run 2         # до 2 статей за проход вместо 1
 
-Ключи API читаются из .env (YANDEX_API_KEY, YANDEX_FOLDER_ID, UNSPLASH_ACCESS_KEY).
+Ключи API читаются из .env (YANDEX_API_KEY, YANDEX_FOLDER_ID, UNSPLASH_ACCESS_KEY)
+локально, либо из GitHub Actions Secrets в CI (см. .github/workflows/news-cron.yml).
 """
 
 from __future__ import annotations
@@ -72,6 +78,12 @@ CONTENT_DIR = ROOT_DIR / "src" / "content" / "news"
 # Сколько статей допускается публиковать за календарный месяц (защита бюджета
 # на YandexGPT/Unsplash). Переопределяется флагом --monthly-limit.
 MONTHLY_ARTICLE_LIMIT = 100
+
+# Сколько статей публикуется максимум за ОДИН проход. Рассчитано под cron из
+# GitHub Actions на 3 запуска в день (06:00, 12:00, 18:00 UTC): 1 статья за
+# проход × 3 прохода/день × ~30 дней ≈ 90 статей/месяц — с запасом укладывается
+# в MONTHLY_ARTICLE_LIMIT. Переопределяется флагом --max-per-run.
+MAX_ARTICLES_PER_RUN = 1
 
 YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
 YANDEX_FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
@@ -737,12 +749,17 @@ def process_entry(entry: Any, history: set[str]) -> Path:
     return filepath
 
 
-def run_once(history: set[str], monthly_limit: int = MONTHLY_ARTICLE_LIMIT) -> int:
-    """Один проход: забирает все новые (не встречавшиеся в history.json) записи
-    ленты и публикует каждую — но не больше, чем позволяет остаток месячного
-    лимита (monthly_limit, считается по publish_log.json за текущий календарный
-    месяц). Ошибка на одной записи не прерывает обработку остальных и не
-    помечает её как обработанную — она будет подхвачена на следующем проходе."""
+def run_once(
+    history: set[str],
+    monthly_limit: int = MONTHLY_ARTICLE_LIMIT,
+    max_per_run: int = MAX_ARTICLES_PER_RUN,
+) -> int:
+    """Один проход: забирает новые (не встречавшиеся в history.json) записи
+    ленты и публикует их — но не больше max_per_run за проход и не больше,
+    чем позволяет остаток месячного лимита (monthly_limit, считается по
+    publish_log.json за текущий календарный месяц). Ошибка на одной записи
+    не прерывает обработку остальных и не помечает её как обработанную —
+    она будет подхвачена на следующем проходе."""
     published_this_month = count_published_this_month()
     if published_this_month >= monthly_limit:
         print(
@@ -759,16 +776,19 @@ def run_once(history: set[str], monthly_limit: int = MONTHLY_ARTICLE_LIMIT) -> i
         print("Новых новостей нет — все ссылки из ленты уже в history.json.")
         return 0
 
-    remaining_budget = monthly_limit - published_this_month
-    print(f"Месячный лимит: опубликовано {published_this_month}/{monthly_limit}, доступно ещё {remaining_budget}.")
+    remaining_budget = min(monthly_limit - published_this_month, max_per_run)
+    print(
+        f"Месячный лимит: опубликовано {published_this_month}/{monthly_limit}. "
+        f"Лимит за проход: {max_per_run}. Опубликую максимум {remaining_budget} за этот запуск."
+    )
 
     published = 0
     for entry in fresh_entries:
         if published >= remaining_budget:
             skipped = len(fresh_entries) - published
             print(
-                f"Достигнут месячный лимит публикаций ({monthly_limit}) — останавливаюсь, "
-                f"{skipped} оставшихся новостей будут обработаны в следующем месяце."
+                f"Достигнут лимит статей за проход ({remaining_budget}) — останавливаюсь, "
+                f"{skipped} оставшихся новостей будут обработаны в следующем запуске."
             )
             break
         try:
@@ -781,12 +801,19 @@ def run_once(history: set[str], monthly_limit: int = MONTHLY_ARTICLE_LIMIT) -> i
     return published
 
 
-def run_loop(interval: int, monthly_limit: int = MONTHLY_ARTICLE_LIMIT) -> int:
-    print(f"Режим цикла: проверяю RSS-ленты каждые {interval} сек. Месячный лимит: {monthly_limit}. Остановка — Ctrl+C.")
+def run_loop(
+    interval: int,
+    monthly_limit: int = MONTHLY_ARTICLE_LIMIT,
+    max_per_run: int = MAX_ARTICLES_PER_RUN,
+) -> int:
+    print(
+        f"Режим цикла: проверяю RSS-ленты каждые {interval} сек. "
+        f"Месячный лимит: {monthly_limit}, лимит за проход: {max_per_run}. Остановка — Ctrl+C."
+    )
     history = load_history()
     while True:
         try:
-            run_once(history, monthly_limit)
+            run_once(history, monthly_limit, max_per_run)
         except Exception as exc:  # noqa: BLE001 — сбой одной проверки не должен убивать цикл
             print(f"Ошибка при проверке ленты: {exc}", file=sys.stderr)
 
@@ -820,13 +847,20 @@ def main() -> int:
         help=f"Максимум публикаций за календарный месяц (по умолчанию {MONTHLY_ARTICLE_LIMIT}). "
         "При достижении лимита проход останавливается до вызова YandexGPT/Unsplash.",
     )
+    parser.add_argument(
+        "--max-per-run",
+        type=int,
+        default=MAX_ARTICLES_PER_RUN,
+        help=f"Максимум статей за один проход (по умолчанию {MAX_ARTICLES_PER_RUN}). "
+        "Рассчитан на cron из GitHub Actions: 3 запуска/день × 1 статья ≈ 90/мес.",
+    )
     args = parser.parse_args()
 
     if args.loop:
-        return run_loop(args.interval, args.monthly_limit)
+        return run_loop(args.interval, args.monthly_limit, args.max_per_run)
 
     history = load_history()
-    run_once(history, args.monthly_limit)
+    run_once(history, args.monthly_limit, args.max_per_run)
     return 0
 
 

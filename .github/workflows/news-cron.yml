@@ -1,0 +1,60 @@
+name: News pipeline
+
+on:
+  schedule:
+    # 06:00, 12:00, 18:00 UTC — 3 запуска в день. При --max-per-run 1 (по
+    # умолчанию в pipeline.py) это даёт ~90 статей в месяц.
+    - cron: '0 6,12,18 * * *'
+  workflow_dispatch: {}
+
+# Нужны права на запись, чтобы шаг commit/push ниже мог закоммитить новые
+# статьи и изображения обратно в репозиторий от имени github-actions[bot].
+permissions:
+  contents: write
+
+# Не даём двум запускам (например, cron и ручному тесту одновременно)
+# конфликтовать при пуше — второй просто дождётся первого в очереди.
+concurrency:
+  group: news-pipeline
+  cancel-in-progress: false
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run news pipeline
+        env:
+          YANDEX_FOLDER_ID: ${{ secrets.YANDEX_FOLDER_ID }}
+          YANDEX_API_KEY: ${{ secrets.YANDEX_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+        run: python pipeline.py
+
+      - name: Check for new content
+        id: changes
+        run: |
+          git add src/content/news/ public/images/ history.json publish_log.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push new articles
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Автопубликация новостей ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+          git push
