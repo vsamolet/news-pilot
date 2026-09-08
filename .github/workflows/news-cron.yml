@@ -21,6 +21,9 @@ concurrency:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
+    # Бэкстоп на весь job (checkout/setup-python/pip install тоже теоретически
+    # могут зависнуть) — отдельно от timeout-minutes на шаге пайплайна ниже.
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,6 +38,10 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run news pipeline
+        # pipeline.py сам себя ограничивает (REQUEST_TIMEOUT=20с на запрос,
+        # MAX_ATTEMPTS_PER_RUN=5 кандидатов), так что в норме проход занимает
+        # секунды-десятки секунд — 5 минут тут чисто аварийный потолок.
+        timeout-minutes: 5
         env:
           YANDEX_FOLDER_ID: ${{ secrets.YANDEX_FOLDER_ID }}
           YANDEX_API_KEY: ${{ secrets.YANDEX_API_KEY }}

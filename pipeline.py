@@ -85,6 +85,13 @@ MONTHLY_ARTICLE_LIMIT = 100
 # в MONTHLY_ARTICLE_LIMIT. Переопределяется флагом --max-per-run.
 MAX_ARTICLES_PER_RUN = 1
 
+# Сколько КАНДИДАТОВ разрешено пробовать за один проход, независимо от того,
+# сколько из них успешно опубликуются. Без этого предела прогон при массовых
+# сетевых сбоях/отказах модерации перебирал бы сотни свежих записей подряд —
+# именно так workflow в GitHub Actions завис более чем на 6 минут. Переопределяется
+# флагом --max-attempts-per-run.
+MAX_ATTEMPTS_PER_RUN = 5
+
 YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
 YANDEX_FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
@@ -212,7 +219,8 @@ def passes_topic_filter(entry: Any) -> bool:
     return _has_any(title + " " + summary, BUSINESS_TEXT_KEYWORDS)
 
 
-REQUEST_TIMEOUT = 60
+REQUEST_TIMEOUT = 20  # жёсткий потолок на ЛЮБОЙ сетевой запрос (requests.get/post) — не больше 20 сек,
+# чтобы перебор нескольких кандидатов из RSS не мог растянуться на много минут (см. MAX_ATTEMPTS_PER_RUN)
 DEFAULT_INTERVAL_SECONDS = 15 * 60  # 15 минут
 
 # --- История обработанных ссылок --------------------------------------------
@@ -753,13 +761,18 @@ def run_once(
     history: set[str],
     monthly_limit: int = MONTHLY_ARTICLE_LIMIT,
     max_per_run: int = MAX_ARTICLES_PER_RUN,
+    max_attempts: int = MAX_ATTEMPTS_PER_RUN,
 ) -> int:
     """Один проход: забирает новые (не встречавшиеся в history.json) записи
-    ленты и публикует их — но не больше max_per_run за проход и не больше,
+    ленты и публикует их — но не больше max_per_run за проход, не больше,
     чем позволяет остаток месячного лимита (monthly_limit, считается по
-    publish_log.json за текущий календарный месяц). Ошибка на одной записи
-    не прерывает обработку остальных и не помечает её как обработанную —
-    она будет подхвачена на следующем проходе."""
+    publish_log.json за текущий календарный месяц), и не пробует больше
+    max_attempts кандидатов подряд (жёсткий предел на случай массовых сетевых
+    сбоев или отказов модерации — см. MAX_ATTEMPTS_PER_RUN). Ошибка на одной
+    записи не прерывает обработку остальных и не помечает её как
+    обработанную — она будет подхвачена на следующем проходе. В любом случае
+    (нашли статью, не нашли, исчерпали лимит попыток) функция возвращается
+    штатно — вызывающий код (main) всегда завершает процесс кодом 0."""
     published_this_month = count_published_this_month()
     if published_this_month >= monthly_limit:
         print(
@@ -779,10 +792,12 @@ def run_once(
     remaining_budget = min(monthly_limit - published_this_month, max_per_run)
     print(
         f"Месячный лимит: опубликовано {published_this_month}/{monthly_limit}. "
-        f"Лимит за проход: {max_per_run}. Опубликую максимум {remaining_budget} за этот запуск."
+        f"Лимит за проход: {max_per_run}, лимит попыток: {max_attempts}. "
+        f"Опубликую максимум {remaining_budget} за этот запуск."
     )
 
     published = 0
+    attempts = 0
     for entry in fresh_entries:
         if published >= remaining_budget:
             skipped = len(fresh_entries) - published
@@ -791,13 +806,20 @@ def run_once(
                 f"{skipped} оставшихся новостей будут обработаны в следующем запуске."
             )
             break
+        if attempts >= max_attempts:
+            print(
+                f"Достигнут лимит попыток за проход ({max_attempts}) — подходящей новости не нашлось, "
+                "завершаюсь штатно, без публикации. Остальные кандидаты — в следующем запуске."
+            )
+            break
+        attempts += 1
         try:
             process_entry(entry, history)
             published += 1
         except Exception as exc:  # noqa: BLE001 — не прерываем цикл из-за одной новости
             print(f"Пропускаю «{entry.get('title', entry.get('link'))}»: {exc}", file=sys.stderr)
 
-    print(f"Опубликовано новых статей: {published}/{len(fresh_entries)}")
+    print(f"Опубликовано новых статей: {published}/{attempts} попыток (из {len(fresh_entries)} кандидатов).")
     return published
 
 
@@ -805,15 +827,17 @@ def run_loop(
     interval: int,
     monthly_limit: int = MONTHLY_ARTICLE_LIMIT,
     max_per_run: int = MAX_ARTICLES_PER_RUN,
+    max_attempts: int = MAX_ATTEMPTS_PER_RUN,
 ) -> int:
     print(
         f"Режим цикла: проверяю RSS-ленты каждые {interval} сек. "
-        f"Месячный лимит: {monthly_limit}, лимит за проход: {max_per_run}. Остановка — Ctrl+C."
+        f"Месячный лимит: {monthly_limit}, лимит за проход: {max_per_run}, лимит попыток: {max_attempts}. "
+        "Остановка — Ctrl+C."
     )
     history = load_history()
     while True:
         try:
-            run_once(history, monthly_limit, max_per_run)
+            run_once(history, monthly_limit, max_per_run, max_attempts)
         except Exception as exc:  # noqa: BLE001 — сбой одной проверки не должен убивать цикл
             print(f"Ошибка при проверке ленты: {exc}", file=sys.stderr)
 
@@ -854,13 +878,20 @@ def main() -> int:
         help=f"Максимум статей за один проход (по умолчанию {MAX_ARTICLES_PER_RUN}). "
         "Рассчитан на cron из GitHub Actions: 3 запуска/день × 1 статья ≈ 90/мес.",
     )
+    parser.add_argument(
+        "--max-attempts-per-run",
+        type=int,
+        default=MAX_ATTEMPTS_PER_RUN,
+        help=f"Максимум кандидатов, которые пробуем за проход, независимо от успеха "
+        f"(по умолчанию {MAX_ATTEMPTS_PER_RUN}). Жёсткий предел на случай сетевых сбоев/отказов модерации.",
+    )
     args = parser.parse_args()
 
     if args.loop:
-        return run_loop(args.interval, args.monthly_limit, args.max_per_run)
+        return run_loop(args.interval, args.monthly_limit, args.max_per_run, args.max_attempts_per_run)
 
     history = load_history()
-    run_once(history, args.monthly_limit, args.max_per_run)
+    run_once(history, args.monthly_limit, args.max_per_run, args.max_attempts_per_run)
     return 0
 
 
