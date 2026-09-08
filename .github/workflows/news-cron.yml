@@ -48,20 +48,17 @@ jobs:
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: python pipeline.py
 
-      - name: Check for new content
-        id: changes
-        run: |
-          git add src/content/news/ public/images/ history.json publish_log.json
-          if git diff --cached --quiet; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Commit and push new articles
-        if: steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Автопубликация новостей ($(date -u +'%Y-%m-%d %H:%M UTC'))"
-          git push
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/news/ public/images/ history.json publish_log.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Автопубликация новостей ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+            # На случай, если main за время работы пайплайна успел уйти вперёд
+            # (параллельный запуск, ручной пуш и т.п.) — подтягиваем и ребейзим
+            # наш коммит поверх свежего HEAD перед пушем, чтобы не улететь в
+            # "Updates were rejected because the remote contains work...".
+            git pull --rebase origin main
+            git push origin main
+          fi
