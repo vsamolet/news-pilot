@@ -40,6 +40,20 @@ jobs:
       - name: Build site
         run: npm run build
 
+      - name: Verify build output
+        # Жёсткая проверка вместо слепого доверия: если dist/ пустой или
+        # подозрительно маленький, job должен упасть здесь с понятной
+        # ошибкой — а не молча уйти на wrangler deploy с неполными файлами.
+        run: |
+          count=$(find dist -type f | wc -l)
+          echo "Файлов в dist/: $count"
+          if [ "$count" -lt 20 ]; then
+            echo "::error::В dist/ всего $count файлов — похоже, npm run build не отработал как надо."
+            exit 1
+          fi
+          test -d dist/news || { echo "::error::dist/news/ отсутствует — статьи не собрались."; exit 1; }
+          echo "OK: dist/ содержит $count файлов, dist/news/ на месте."
+
       - name: Deploy to Cloudflare Workers (100% трафика)
         # Обычный `wrangler deploy` (не `versions upload`) сразу отправляет
         # 100% трафика на новую версию — никакого gradual rollout здесь нет.
