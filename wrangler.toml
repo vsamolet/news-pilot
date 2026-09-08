@@ -1,0 +1,11 @@
+name = "news-pilot"
+compatibility_date = "2026-09-08"
+
+# Доступ через *.workers.dev (сейчас сайт живёт на news-pilot.vitaly-samolet.workers.dev).
+workers_dev = true
+
+# Astro собирает чистый статический сайт (без SSR-адаптера) в dist/ —
+# Worker раздаёт его напрямую через нативные Static Assets, без своего
+# JS-скрипта (поле "main" не нужно для чисто статической раздачи).
+[assets]
+directory = "./dist"
