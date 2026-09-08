@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import AccentCard from '../components/AccentCard.astro';
 import Sidebar from '../components/Sidebar.astro';
 import { categoryLabel } from '../lib/categories';
 
@@ -11,8 +12,9 @@ const allNews = (await getCollection('news')).sort(
 
 const featured = allNews.find((e) => e.data.featured) ?? allNews[0];
 const rest = allNews.filter((e) => e.id !== featured.id);
-const gridItems = rest.slice(0, 6);
-const sidebarItems = allNews.slice(0, 6);
+const accents = rest.slice(0, 3);
+const feedItems = rest.slice(3, 9);
+const tickerItems = allNews.slice(0, 10);
 
 const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
   day: 'numeric',
@@ -24,41 +26,50 @@ const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
 
 <Layout title="Деловой Вестник">
   <div class="max-w-6xl mx-auto px-4 py-10">
-    <!-- Top story -->
-    <section class="grid md:grid-cols-2 gap-8 md:gap-12 border-b-4 border-ink pb-10 mb-10">
-      <a href={`/news/${featured.id}/`} class="block bg-ink aspect-[16/10] overflow-hidden">
-        <img
-          src={featured.data.image}
-          alt={featured.data.title}
-          class="w-full h-full object-cover"
-        />
-      </a>
-      <div class="flex flex-col justify-center">
-        <div class="text-xs uppercase tracking-wide font-semibold text-accent mb-3">
-          {categoryLabel(featured.data.category)} &middot; Главная тема
-        </div>
-        <a href={`/news/${featured.id}/`}>
-          <h1 class="font-serif text-3xl md:text-4xl font-bold leading-tight hover:text-accent transition-colors">
-            {featured.data.title}
-          </h1>
+    <!-- Первый экран: главная новость + акценты дня -->
+    <section class="grid lg:grid-cols-5 gap-10 pb-10 mb-10 border-b border-hairline">
+      <div class="lg:col-span-3">
+        <a href={`/news/${featured.id}/`} class="block border border-hairline aspect-[16/9] overflow-hidden bg-ink/5">
+          <img
+            src={featured.data.image}
+            alt={featured.data.title}
+            class="w-full h-full object-cover"
+          />
         </a>
-        <p class="mt-4 text-lg text-ink/75 leading-relaxed">{featured.data.lead}</p>
-        <time datetime={featured.data.pubDate.toISOString()} class="mt-4 text-sm text-ink/45">
-          {featuredDate}
-        </time>
+        <div class="mt-5">
+          <div class="text-xs uppercase tracking-wide font-semibold text-accent mb-3">
+            {categoryLabel(featured.data.category)} &middot; Главная тема
+          </div>
+          <a href={`/news/${featured.id}/`}>
+            <h1 class="font-serif text-3xl md:text-4xl font-bold leading-tight hover:text-accent transition-colors">
+              {featured.data.title}
+            </h1>
+          </a>
+          <p class="mt-4 text-lg text-ink/75 leading-relaxed">{featured.data.lead}</p>
+          <time datetime={featured.data.pubDate.toISOString()} class="mt-4 block text-sm text-muted">
+            {featuredDate}
+          </time>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2">
+        <h2 class="font-serif text-lg font-bold border-b-2 border-ink pb-2 mb-5">Акценты дня</h2>
+        <div class="space-y-5">
+          {accents.map((entry) => <AccentCard entry={entry} />)}
+        </div>
       </div>
     </section>
 
-    <!-- Grid + sidebar -->
+    <!-- Второй экран: лента аналитики + картина дня -->
     <div class="grid lg:grid-cols-3 gap-x-10 gap-y-12">
       <section class="lg:col-span-2">
         <h2 class="font-serif text-xl font-bold border-b-2 border-ink pb-2 mb-6">Главные новости</h2>
         <div class="grid sm:grid-cols-2 gap-x-8 gap-y-10">
-          {gridItems.map((entry) => <ArticleCard entry={entry} />)}
+          {feedItems.map((entry) => <ArticleCard entry={entry} />)}
         </div>
       </section>
 
-      <Sidebar entries={sidebarItems} />
+      <Sidebar entries={tickerItems} title="Картина дня / Молнии" />
     </div>
   </div>
 </Layout>

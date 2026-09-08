@@ -80,25 +80,32 @@ UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 YANDEXGPT_COMPLETION_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 UNSPLASH_RANDOM_PHOTO_URL = "https://api.unsplash.com/photos/random"
 
-MIN_FULL_TEXT_CHARS = 200  # ниже этого порога считаем извлечение неудачным
-MIN_BODY_CHARS = 1200  # минимум по ТЗ для тела статьи
+MIN_FULL_TEXT_CHARS = 500  # ниже этого порога — пропускаем новость целиком, не тратим токены на GPT
+MIN_BODY_CHARS = 1200  # ориентир для информационного сообщения о длине (не требование — короткая заметка это ок)
+
+BROWSER_USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+)
 
 
 def build_system_prompt(source_name: str) -> str:
     """Системный промпт для YandexGPT. Название источника подставляется в
-    правило атрибуции (пункт 5) — у каждой записи из SOURCES оно своё."""
-    return f"""Ты — выпускающий редактор независимого делового издания. Твоя задача — написать полноценную, развернутую новостную заметку на основе предоставленного исходного материала.
+    правило атрибуции (пункт 3) — у каждой записи из SOURCES оно своё."""
+    return f"""Ты — редактор новостной службы информагентства. Твоя задача — сделать сухой, ёмкий и фактологический рерайт новости.
 
-Правила оформления:
-1. Заголовок (title): строгий, информативный, без кликбейта и кавычек в начале.
-2. Лид (lead): 1-2 предложения, отвечающие на вопросы "Кто? Что? Где? Когда?".
-3. Тело статьи (body): 3–5 развернутых абзацев (минимум 1200–1500 знаков). Полный глубокий пересказ своими словами.
-4. Фактура: сохрани абсолютно все цифры, даты, проценты, денежные суммы, должности и фамилии спикеров без искажений.
-5. Атрибуция источника: обязательно упомяни первоисточник органично внутри текста (во 2-м или 3-м абзаце), используя конструкции вроде: "сообщает {source_name}", "как передает {source_name}", "об этом пишет {source_name}". Никогда не ставь ссылку в заголовок или самое первое предложение лида.
-6. Стиль: строгий новостной нейтралитет, деловая журналистика. Никаких оценочных суждений, штампов ("как стало известно", "эксперты бьют тревогу") и выдуманных фактов.
-7. Подбор визуала: image_query — 2-3 конкретных ключевых слова на английском языке для поиска релевантного фото на Unsplash (например: "container port", "medical surgery", "wind turbine").
+КРИТИЧЕСКИЕ ПРАВИЛА:
+1. ИСПОЛЬЗУЙ ТОЛЬКО ФАКТЫ ИЗ ИСТОЧНИКА. Категорически запрещено додумывать контекст, предполагать ("это может свидетельствовать", "вероятно"), рассуждать о важности события ("в современных реалиях", "в условиях постоянных изменений") или нахваливать спикеров ("обладает значительным опытом и экспертизой").
+2. НИКАКОЙ ВОДЫ. Если в источнике мало информации — напиши короткую, но ёмкую заметку (2 абзаца). Не пытайся искусственно растягивать текст общими фразами, выводами или обобщениями "ни о чём".
+3. Структура:
+   - Заголовок (title): информативный, без кликбейта.
+   - Лид (lead): главная суть события в одном предложении.
+   - Тело (body): строго факты, цифры, цитаты и предыстория из текста. Обязательно вставь атрибуцию источника ("как пишет {source_name}", "сообщает {source_name}") во 2-м или 3-м абзаце — но не в заголовке и не в первом предложении лида.
+   - Категория (category): economics, business, markets, tech или society — что лучше всего описывает тему.
+4. Если фактов в источнике недостаточно для полноценной новости — отдай только сухую фактуру без малейшей отсебятины, даже если тело выйдет короче обычного.
+5. Подбор визуала: image_query — 2-3 конкретных ключевых слова на английском языке для поиска релевантного фото на Unsplash (например: "container port", "medical surgery", "wind turbine").
 
-Технически важно: в значении body разделяй абзацы двойным переносом строки (\\n\\n) — так, чтобы при рендере получилось 3–5 отдельных абзацев, а не один сплошной блок текста.
+Технически важно: в значении body разделяй абзацы двойным переносом строки (\\n\\n).
 
 Формат ответа: СТРОГО валидный JSON без markdown-оберток (без ```json):
 {{
@@ -328,13 +335,6 @@ def deduplicate_by_topic(entries: list[Any]) -> list[Any]:
     return kept
 
 
-def entry_summary_fallback(entry: Any) -> str:
-    summary = entry.get("summary") or entry.get("description") or ""
-    summary = re.sub(r"<[^>]+>", " ", summary)
-    summary = re.sub(r"\s+", " ", summary).strip()
-    return summary
-
-
 TITLE_OVERLAP_THRESHOLD = 0.3  # доля общих слов заголовков (см. _titles_match) — используется и
 # для детекта подмены страницы (fetch_full_text), и для кросс-source дедупликации тем (deduplicate_by_topic)
 _STEM_LEN = 5  # грубый стемминг: обрезаем слово длиннее этого до первых N символов, чтобы
@@ -370,42 +370,65 @@ def _titles_match(expected: str, actual: str, threshold: float = TITLE_OVERLAP_T
 
 
 def fetch_full_text(url: str, expected_title: str | None = None) -> str | None:
-    """Скачивает страницу первоисточника и извлекает основной текст статьи
-    через trafilatura. Возвращает None, если скачать/извлечь не удалось —
-    либо если заголовок скачанной страницы явно разошёлся с ожидаемым
-    (см. предупреждение про нестабильные URL РБК выше)."""
+    """Скачивает страницу первоисточника (с реалистичным браузерным
+    User-Agent — многие сайты отдают пустой/урезанный ответ ботам без него)
+    и извлекает основной текст через trafilatura. Всегда логирует точное
+    число извлечённых символов. Возвращает None, если скачать/извлечь не
+    удалось, если текста меньше MIN_FULL_TEXT_CHARS, либо если заголовок
+    страницы явно разошёлся с ожидаемым (см. блок про нестабильные URL РБК
+    ниже) — в любом из этих случаев вызывающий код обязан пропустить новость
+    целиком, а не откатываться на короткий анонс из RSS (см. build_source_material)."""
     try:
-        downloaded = trafilatura.fetch_url(url)
-    except Exception:
-        downloaded = None
+        response = requests.get(
+            url,
+            headers={"User-Agent": BROWSER_USER_AGENT},
+            timeout=REQUEST_TIMEOUT,
+        )
+        response.raise_for_status()
+        downloaded = response.text
+    except requests.RequestException as exc:
+        print(f"Не удалось скачать {url}: {exc}", file=sys.stderr)
+        return None
 
     if not downloaded:
+        print(f"Извлечено 0 симв. текста первоисточника ({url}) — пустой ответ.")
         return None
 
     try:
         result_json = trafilatura.extract(
             downloaded,
+            url=url,
             include_comments=False,
             include_tables=False,
             favor_recall=True,
             output_format="json",
             with_metadata=True,
         )
-    except Exception:
+    except Exception as exc:
+        print(f"Ошибка извлечения текста ({url}): {exc}", file=sys.stderr)
         result_json = None
 
     if not result_json:
+        print(f"Извлечено 0 симв. текста первоисточника ({url}) — trafilatura не нашла статью.")
         return None
 
     try:
         data = json.loads(result_json)
     except json.JSONDecodeError:
+        print(f"Извлечено 0 симв. текста первоисточника ({url}) — не распарсился JSON trafilatura.")
         return None
 
     text = (data.get("text") or "").strip()
     page_title = (data.get("title") or "").strip()
 
-    if not text or len(text) < MIN_FULL_TEXT_CHARS:
+    print(f"Извлечено {len(text)} симв. текста первоисточника ({url}).")
+
+    if len(text) < MIN_FULL_TEXT_CHARS:
+        print(
+            f"Меньше порога отсечения ({MIN_FULL_TEXT_CHARS} симв.) — пропускаю новость, "
+            "не трачу токены на генерацию из скудного материала.",
+            file=sys.stderr,
+        )
         return None
 
     if expected_title and page_title and not _titles_match(expected_title, page_title):
@@ -414,7 +437,7 @@ def fetch_full_text(url: str, expected_title: str | None = None) -> str | None:
             f"заголовок на странице сейчас «{page_title}», а ожидался «{expected_title}». "
             "Такое случается с недолговечными URL (/rbcfreenews/, иногда /quote/) — "
             "РБК может со временем переиспользовать тот же адрес под другой материал. "
-            "Игнорирую скачанный полный текст, использую анонс из RSS.",
+            "Пропускаю новость — не генерирую статью по потенциально нерелевантному тексту.",
             file=sys.stderr,
         )
         return None
@@ -422,26 +445,31 @@ def fetch_full_text(url: str, expected_title: str | None = None) -> str | None:
     return text
 
 
+class ThinSourceError(Exception):
+    """Первоисточник не дал достаточно текста — новость должна быть
+    пропущена без обращения к YandexGPT (см. fetch_full_text)."""
+
+
 def build_source_material(entry: Any) -> str:
-    """Готовит текст для передачи модели: полный текст первоисточника,
-    а если извлечь не удалось (или страница оказалась подменена) — краткий
-    анонс из RSS (title + summary)."""
+    """Готовит текст для передачи модели: строго полный текст первоисточника.
+    Больше НЕ откатывается на анонс из RSS — короткий анонс, растянутый
+    моделью до "нормы" объёма, был источником статей ни о чём (см. историю
+    правок). Если полный текст недоступен/слишком короткий — поднимает
+    ThinSourceError, чтобы вызывающий код пропустил новость целиком."""
     title = (entry.get("title") or "").strip()
     link = entry.get("link") or ""
     source_name = entry.get("source_name") or "источник"
 
     full_text = fetch_full_text(link, expected_title=title) if link else None
-    if full_text:
-        print(f"Полный текст первоисточника извлечён ({len(full_text)} симв.).")
-        body_text = full_text
-    else:
-        print("Не удалось извлечь полный текст — использую анонс из RSS.")
-        body_text = entry_summary_fallback(entry)
+    if not full_text:
+        raise ThinSourceError(
+            f"Не удалось получить достаточно текста первоисточника (порог {MIN_FULL_TEXT_CHARS} симв.)."
+        )
 
     return (
         f"Источник: {source_name}\n"
         f"Заголовок исходной новости: {title}\n\n"
-        f"Текст:\n{body_text}"
+        f"Текст:\n{full_text}"
     )
 
 
@@ -488,10 +516,21 @@ def call_yandex_gpt(source_material: str, source_name: str) -> dict[str, str]:
     except (KeyError, IndexError) as exc:
         raise RuntimeError(f"Неожиданный формат ответа YandexGPT: {data}") from exc
 
-    return parse_model_json(raw_text)
+    return parse_model_json(raw_text, source_name)
 
 
-def parse_model_json(raw_text: str) -> dict[str, str]:
+def _find_attribution_paragraph(body: str, source_name: str) -> int | None:
+    """Возвращает индекс (с 0) абзаца, где впервые упомянут source_name, или
+    None, если атрибуция вообще не найдена в тексте."""
+    paragraphs = [p for p in body.split("\n\n") if p.strip()]
+    source_lower = source_name.lower()
+    for i, paragraph in enumerate(paragraphs):
+        if source_lower in paragraph.lower():
+            return i
+    return None
+
+
+def parse_model_json(raw_text: str, source_name: str) -> dict[str, str]:
     cleaned = raw_text.strip()
     cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", cleaned, flags=re.MULTILINE).strip()
 
@@ -517,7 +556,21 @@ def parse_model_json(raw_text: str) -> dict[str, str]:
     body_len = len(parsed["body"].strip())
     if body_len < MIN_BODY_CHARS:
         print(
-            f"Предупреждение: тело статьи короче ожидаемого ({body_len} знаков, минимум {MIN_BODY_CHARS}).",
+            f"Инфо: тело статьи короче целевого ({body_len} знаков, ориентир {MIN_BODY_CHARS}) — "
+            "это ожидаемо при коротком исходном материале, промпт запрещает добавлять заполнители.",
+            file=sys.stderr,
+        )
+
+    attribution_idx = _find_attribution_paragraph(parsed["body"], source_name)
+    if attribution_idx is None:
+        print(
+            f"Предупреждение: атрибуция источника «{source_name}» не найдена в тексте статьи.",
+            file=sys.stderr,
+        )
+    elif attribution_idx not in (1, 2):
+        print(
+            f"Предупреждение: атрибуция источника стоит в {attribution_idx + 1}-м абзаце "
+            "(по промпту ожидался 2-й или 3-й).",
             file=sys.stderr,
         )
 
@@ -538,7 +591,11 @@ def _search_unsplash_photo(query: str) -> dict:
     return response.json()
 
 
-def fetch_unsplash_image(query: str, slug: str) -> str:
+def fetch_unsplash_image(query: str, slug: str) -> tuple[str, str | None, str | None]:
+    """Скачивает фото с Unsplash и сохраняет как WebP. Возвращает
+    (путь_к_файлу, имя_автора, ссылка_на_профиль_автора) — имя/ссылка нужны
+    для подписи "Фото: {автор} / Unsplash" на странице статьи; берутся из
+    поля "user" ответа Unsplash API (обязательное по их правилам атрибуции)."""
     if not UNSPLASH_ACCESS_KEY:
         raise RuntimeError("UNSPLASH_ACCESS_KEY не задан в .env")
 
@@ -558,6 +615,13 @@ def fetch_unsplash_image(query: str, slug: str) -> str:
         photo = photo[0]
     image_url = photo["urls"]["regular"]
 
+    user = photo.get("user") or {}
+    credit_name = user.get("name")
+    credit_url = (user.get("links") or {}).get("html")
+    if credit_url:
+        # UTM-параметры атрибуции — требование Unsplash API Guidelines.
+        credit_url += ("&" if "?" in credit_url else "?") + "utm_source=delovoy-vestnik&utm_medium=referral"
+
     image_response = requests.get(image_url, timeout=REQUEST_TIMEOUT)
     image_response.raise_for_status()
 
@@ -568,7 +632,7 @@ def fetch_unsplash_image(query: str, slug: str) -> str:
     image = Image.open(io.BytesIO(image_response.content)).convert("RGB")
     image.save(filepath, "WEBP", quality=85)
 
-    return f"/images/{filename}"
+    return f"/images/{filename}", credit_name, credit_url
 
 
 # --- Markdown -------------------------------------------------------------------
@@ -609,6 +673,8 @@ def build_markdown(
     image_path: str,
     source_url: str,
     pub_date: datetime,
+    image_credit: str | None = None,
+    image_credit_url: str | None = None,
 ) -> Path:
     frontmatter_lines = [
         "---",
@@ -617,6 +683,12 @@ def build_markdown(
         f"pubDate: {pub_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')}",
         f"category: {article['category']}",
         f"image: {image_path}",
+    ]
+    if image_credit:
+        frontmatter_lines.append(f"image_credit: {yaml_quote(image_credit)}")
+    if image_credit_url:
+        frontmatter_lines.append(f"image_credit_url: {yaml_quote(image_credit_url)}")
+    frontmatter_lines += [
         f"source_url: {yaml_quote(source_url)}",
         "---",
         "",
@@ -649,10 +721,12 @@ def process_entry(entry: Any, history: set[str]) -> Path:
     slug = unique_slug(base_slug)
 
     print(f"Ищу изображение по запросу «{article['image_query']}» на Unsplash...")
-    image_path = fetch_unsplash_image(article["image_query"], slug)
+    image_path, image_credit, image_credit_url = fetch_unsplash_image(article["image_query"], slug)
 
     pub_date = entry_pub_date(entry)
-    filepath = build_markdown(article, slug, image_path, entry.link, pub_date)
+    filepath = build_markdown(
+        article, slug, image_path, entry.link, pub_date, image_credit, image_credit_url
+    )
 
     history.add(entry.link)
     save_history(history)

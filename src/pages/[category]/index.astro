@@ -15,14 +15,14 @@ const allNews = (await getCollection('news')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 const items = allNews.filter((e) => e.data.category === category);
-const sidebarItems = allNews.slice(0, 6);
+const tickerItems = allNews.slice(0, 8);
 const label = categoryLabel(category!);
 ---
 
 <Layout title={label} description={`Последние новости в рубрике «${label}» — Деловой Вестник.`}>
   <div class="max-w-6xl mx-auto px-4 py-10">
-    <header class="border-b-4 border-ink pb-4 mb-10">
-      <p class="text-xs uppercase tracking-wide text-ink/50 mb-1">
+    <header class="pb-4 mb-10 border-b-2 border-accent">
+      <p class="text-xs uppercase tracking-wide text-muted mb-1">
         <a href="/" class="hover:text-accent">Главная</a> / {label}
       </p>
       <h1 class="font-serif text-4xl font-bold">{label}</h1>
@@ -35,11 +35,11 @@ const label = categoryLabel(category!);
             {items.map((entry) => <ArticleCard entry={entry} />)}
           </div>
         ) : (
-          <p class="text-ink/60">В этой рубрике пока нет публикаций.</p>
+          <p class="text-muted">В этой рубрике пока нет публикаций.</p>
         )}
       </section>
 
-      <Sidebar entries={sidebarItems} />
+      <Sidebar entries={tickerItems} title="Картина дня" />
     </div>
   </div>
 </Layout>

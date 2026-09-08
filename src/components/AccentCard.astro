@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { categoryLabel } from '../lib/categories';
+
+interface Props {
+  entry: CollectionEntry<'news'>;
+}
+
+const { entry } = Astro.props;
+const { title, category, image, pubDate } = entry.data;
+const timeLabel = pubDate.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+---
+
+<a href={`/news/${entry.id}/`} class="group flex gap-3 items-start">
+  <div class="shrink-0 w-20 h-20 overflow-hidden border border-hairline bg-ink/5">
+    <img
+      src={image}
+      alt={title}
+      loading="lazy"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    />
+  </div>
+  <div class="min-w-0">
+    <div class="flex items-center gap-2 text-[11px] uppercase tracking-wide">
+      <span class="text-accent font-semibold">{categoryLabel(category)}</span>
+      <span class="text-muted">{timeLabel}</span>
+    </div>
+    <h3 class="mt-1 font-serif text-base font-bold leading-snug group-hover:text-accent transition-colors">
+      {title}
+    </h3>
+  </div>
+</a>

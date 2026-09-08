@@ -1,7 +1,7 @@
 export const CATEGORIES: Record<string, string> = {
   economics: 'Экономика',
-  business: 'Бизнес',
-  markets: 'Финансы',
+  business: 'Компании',
+  markets: 'Рынки',
   tech: 'Технологии',
   society: 'Общество',
 };

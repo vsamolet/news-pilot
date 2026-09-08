@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { categoryLabel } from '../lib/categories';
+
+interface Props {
+  entries: CollectionEntry<'news'>[];
+}
+
+const { entries } = Astro.props;
+if (entries.length === 0) return null;
+---
+
+<section class="mt-16 pt-8 border-t border-hairline">
+  <h2 class="font-serif text-lg font-bold mb-6">Читайте также</h2>
+  <div class="grid sm:grid-cols-3 gap-6">
+    {entries.map((entry) => (
+      <a href={`/news/${entry.id}/`} class="group block">
+        <div class="overflow-hidden border border-hairline bg-ink/5 aspect-[3/2]">
+          <img
+            src={entry.data.image}
+            alt={entry.data.title}
+            loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+        <div class="mt-2 text-[11px] uppercase tracking-wide text-accent font-semibold">
+          {categoryLabel(entry.data.category)}
+        </div>
+        <h3 class="mt-1 font-serif text-base font-bold leading-snug group-hover:text-accent transition-colors">
+          {entry.data.title}
+        </h3>
+      </a>
+    ))}
+  </div>
+</section>

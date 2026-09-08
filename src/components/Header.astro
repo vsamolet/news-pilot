@@ -7,27 +7,80 @@ const today = new Date().toLocaleDateString('ru-RU', {
   month: 'long',
   year: 'numeric',
 });
+
+// Статус торговой сессии Мосбиржи — вычисляется по московскому времени сборки
+// страницы (сайт статический, значение обновляется при следующей генерации).
+function getMoexStatus(): string {
+  const now = new Date();
+  const weekday = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', weekday: 'short' }).format(now);
+  const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', hour: 'numeric', hourCycle: 'h23' }).format(now));
+  const minute = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', minute: 'numeric' }).format(now));
+  const isWeekday = weekday !== 'Sat' && weekday !== 'Sun';
+  const minutesOfDay = hour * 60 + minute;
+  const isOpen = isWeekday && minutesOfDay >= 10 * 60 && minutesOfDay < 18 * 60 + 45;
+  return isOpen ? 'Мосбиржа: торги открыты' : 'Мосбиржа: торги закрыты';
+}
+
+const moexStatus = getMoexStatus();
+const shareUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const currentPath = Astro.url.pathname;
 ---
 
 <header class="border-b border-ink bg-paper">
   <div class="max-w-6xl mx-auto px-4">
-    <div class="flex items-center justify-between py-2 text-xs uppercase tracking-wide text-ink/60 border-b border-hairline">
-      <span class="capitalize">{today}</span>
-      <span>Деловые новости и аналитика</span>
+    <div class="flex items-center justify-between py-2 text-xs text-muted border-b border-hairline">
+      <div class="flex items-center gap-3">
+        <span class="capitalize">{today}</span>
+        <span class="hidden sm:inline text-hairline">&middot;</span>
+        <span class="hidden sm:inline">{moexStatus}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a
+          href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Поделиться в Telegram"
+          class="text-muted hover:text-accent transition-colors"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3.5 2.5 11.2c-1 .4-1 1.5.1 1.8l4.6 1.5 1.8 5.6c.3.9 1.4 1.1 2 .4l2.6-2.9 4.8 3.6c.8.6 2 .2 2.2-.8L23.9 4.5c.3-1.1-.8-2-1.9-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.6 14.4 18.3 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </a>
+        <a
+          href={`https://vk.com/share.php?url=${encodeURIComponent(shareUrl)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Поделиться ВКонтакте"
+          class="text-muted hover:text-accent transition-colors"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.2 17.3C6.7 17.3 3.1 12.9 3 5.6h3.4c.1 5.3 2.4 7.5 4.2 8V5.6h3.2v4.5c1.8-.2 3.6-2.3 4.2-4.5h3.2c-.5 2.7-2.5 4.8-3.9 5.7 1.4.7 3.7 2.5 4.6 5.9h-3.5c-.7-2.1-2.4-3.7-4.6-4v4h-.6z" fill="currentColor"/></svg>
+        </a>
+        <a href="/rss.xml" aria-label="RSS-лента" class="text-muted hover:text-accent transition-colors">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4a16 16 0 0 1 16 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 10a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="5.5" cy="18.5" r="1.8" fill="currentColor"/></svg>
+        </a>
+      </div>
     </div>
 
     <div class="py-6 text-center">
       <a href="/" class="inline-block">
         <span class="font-serif text-4xl md:text-5xl font-bold tracking-tight text-ink">Деловой Вестник</span>
       </a>
-      <p class="mt-1 text-xs uppercase tracking-[0.2em] text-ink/50">Экономика &middot; Бизнес &middot; Рынки</p>
+      <p class="mt-1 text-xs uppercase tracking-[0.2em] text-muted">Экономика &middot; Компании &middot; Рынки</p>
     </div>
 
     <nav class="border-t border-ink">
-      <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 py-3 text-sm font-semibold uppercase tracking-wide">
-        <li><a href="/" class="hover:text-accent transition-colors">Главная</a></li>
+      <ul class="flex flex-wrap justify-center gap-x-7 gap-y-2 py-3 text-sm font-medium">
+        <li>
+          <a href="/" class="nav-link" aria-current={currentPath === '/' ? 'page' : undefined}>Главная</a>
+        </li>
         {Object.entries(CATEGORIES).map(([slug, label]) => (
-          <li><a href={`/${slug}/`} class="hover:text-accent transition-colors">{label}</a></li>
+          <li>
+            <a
+              href={`/${slug}/`}
+              class="nav-link"
+              aria-current={currentPath === `/${slug}/` ? 'page' : undefined}
+            >
+              {label}
+            </a>
+          </li>
         ))}
       </ul>
     </nav>

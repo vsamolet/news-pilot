@@ -2,12 +2,13 @@
 
 @theme {
   --font-serif: "PT Serif", Georgia, "Times New Roman", serif;
-  --font-sans: "PT Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  --color-ink: #1a1a1a;
-  --color-paper: #fbfaf7;
-  --color-accent: #a3231f;
-  --color-hairline: #d8d4cb;
+  --color-ink: #18181b;
+  --color-paper: #fafafa;
+  --color-accent: #7a2333;
+  --color-hairline: #e4e4e7;
+  --color-muted: #71717a;
 }
 
 html {
@@ -25,8 +26,8 @@ body {
 }
 
 .prose-article p {
-  margin-top: 1.25em;
-  line-height: 1.8;
+  margin-top: 1.4em;
+  line-height: 1.85;
 }
 
 .prose-article h2 {
@@ -41,4 +42,25 @@ body {
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 2px;
+  background-color: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
 }

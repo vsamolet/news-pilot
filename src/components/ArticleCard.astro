@@ -13,19 +13,19 @@ const dateLabel = pubDate.toLocaleDateString('ru-RU', { day: 'numeric', month: '
 
 <article class="group">
   <a href={`/news/${entry.id}/`} class="block">
-    <div class="overflow-hidden bg-ink/5 aspect-[3/2]">
+    <div class="overflow-hidden border border-hairline bg-ink/5 aspect-[3/2]">
       <img
         src={image}
         alt={title}
         loading="lazy"
-        class="w-full h-full object-cover grayscale-[15%] group-hover:scale-105 transition-transform duration-300"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
     </div>
     <div class="mt-3">
       <div class="flex items-center gap-2 text-xs uppercase tracking-wide">
         <span class="text-accent font-semibold">{categoryLabel(category)}</span>
-        <span class="text-ink/40">&middot;</span>
-        <time datetime={pubDate.toISOString()} class="text-ink/50">{dateLabel}</time>
+        <span class="text-muted">&middot;</span>
+        <time datetime={pubDate.toISOString()} class="text-muted">{dateLabel}</time>
       </div>
       <h3 class="mt-2 font-serif text-xl font-bold leading-snug group-hover:text-accent transition-colors">
         {title}

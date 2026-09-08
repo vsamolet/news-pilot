@@ -9,6 +9,8 @@ const news = defineCollection({
     pubDate: z.coerce.date(),
     category: z.string(),
     image: z.string(),
+    image_credit: z.string().optional(),
+    image_credit_url: z.string().url().optional(),
     source_url: z.string().url(),
     featured: z.boolean().optional().default(false),
   }),
