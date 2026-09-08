@@ -10,7 +10,19 @@ const allNews = (await getCollection('news')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-const featured = allNews.find((e) => e.data.featured) ?? allNews[0];
+// Главная тема дня выбирается автоматически: приоритет — самая свежая
+// новость из профильных деловых рубрик (рынки/экономика/компании) за
+// последние 24 часа. Если за сутки в этих рубриках ничего не выходило —
+// берём просто самый свежий материал сайта, в какой бы рубрике он ни был.
+const HERO_PRIORITY_CATEGORIES = new Set(['markets', 'economics', 'business']);
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const now = Date.now();
+
+const recentPriorityNews = allNews.filter(
+  (e) => HERO_PRIORITY_CATEGORIES.has(e.data.category) && now - e.data.pubDate.valueOf() <= ONE_DAY_MS
+); // allNews уже отсортирован по убыванию даты — порядок сохраняется после filter
+
+const featured = recentPriorityNews[0] ?? allNews[0];
 const rest = allNews.filter((e) => e.id !== featured.id);
 const accents = rest.slice(0, 3);
 const feedItems = rest.slice(3, 9);

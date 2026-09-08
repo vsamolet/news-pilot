@@ -4,37 +4,20 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="mt-16 border-t border-hairline">
-  <div class="max-w-6xl mx-auto px-4 py-12">
-    <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
-      <div>
-        <p class="font-serif text-xl font-bold text-ink">Деловой Вестник</p>
-        <p class="mt-3 text-sm text-muted leading-relaxed max-w-sm">
-          Независимое деловое издание. Материалы формируются на основе агрегации
-          новостей открытых источников (РБК, «Коммерсантъ», «Ведомости») с
-          указанием первоисточника в каждой публикации.
-        </p>
-      </div>
-      <div>
-        <p class="text-xs uppercase tracking-widest text-muted mb-3">Рубрики</p>
-        <ul class="space-y-1.5 text-sm">
+  <div class="max-w-6xl mx-auto px-4 py-10">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+      <p class="font-serif text-lg font-bold text-ink">Деловой Вестник</p>
+      <nav>
+        <ul class="flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
           {Object.entries(CATEGORIES).map(([slug, label]) => (
             <li><a href={`/${slug}/`} class="text-ink/80 hover:text-accent transition-colors">{label}</a></li>
           ))}
         </ul>
-      </div>
-      <div>
-        <p class="text-xs uppercase tracking-widest text-muted mb-3">Источники и подписка</p>
-        <ul class="space-y-1.5 text-sm">
-          <li><a href="/rss.xml" class="text-ink/80 hover:text-accent transition-colors">RSS-лента</a></li>
-          <li><a href="https://www.rbc.ru" target="_blank" rel="noopener noreferrer" class="text-ink/80 hover:text-accent transition-colors">РБК</a></li>
-          <li><a href="https://www.kommersant.ru" target="_blank" rel="noopener noreferrer" class="text-ink/80 hover:text-accent transition-colors">Коммерсантъ</a></li>
-          <li><a href="https://www.vedomosti.ru" target="_blank" rel="noopener noreferrer" class="text-ink/80 hover:text-accent transition-colors">Ведомости</a></li>
-        </ul>
-      </div>
+      </nav>
     </div>
-    <div class="mt-10 pt-6 border-t border-hairline flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted">
+    <div class="mt-8 pt-6 border-t border-hairline flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted">
       <span>&copy; {year} Деловой Вестник. Все права защищены.</span>
-      <span>Материалы — результат автоматического пересказа новостей открытых источников и могут не отражать позицию их авторов.</span>
+      <span>Новости экономики, бизнеса и финансовых рынков.</span>
     </div>
   </div>
 </footer>
