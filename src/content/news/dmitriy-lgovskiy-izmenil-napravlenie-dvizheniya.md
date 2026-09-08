@@ -2,7 +2,7 @@
 title: "Дмитрий Льговский изменил направление движения"
 lead: "Профессионал в области коммуникаций получил новое важное назначение в КГ PROGRESS."
 pubDate: 2026-09-08T16:30:00.000Z
-category: society
+category: business
 image: "/images/friend.jpg"
 source_url: "https://news-pilot.vitaly-samolet.workers.dev"
 ---
