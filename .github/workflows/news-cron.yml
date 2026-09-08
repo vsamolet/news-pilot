@@ -27,6 +27,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Полная история (не мелкий fetch-depth:1 по умолчанию) — без неё
+          # `git pull --rebase`/явный checkout ветки ниже не имеет опоры и
+          # шаг коммита падает с "Updates were rejected". Заодно checkout
+          # переключается на реальную ветку main вместо detached HEAD.
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -48,17 +55,26 @@ jobs:
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: python pipeline.py
 
-      - name: Commit and push new articles
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Забираем актуальное состояние origin/main и явно переключаемся на
+          # ветку (checkout@v4 при обычном запуске оставляет detached HEAD —
+          # без этого шага пуш ниже не знает, в какую ветку он метит).
+          git fetch origin main
+          git checkout main
+
           git add src/content/news/ public/images/ history.json publish_log.json
+
           if ! git diff --staged --quiet; then
             git commit -m "Автопубликация новостей ($(date -u +'%Y-%m-%d %H:%M UTC'))"
             # На случай, если main за время работы пайплайна успел уйти вперёд
             # (параллельный запуск, ручной пуш и т.п.) — подтягиваем и ребейзим
-            # наш коммит поверх свежего HEAD перед пушем, чтобы не улететь в
-            # "Updates were rejected because the remote contains work...".
+            # наш коммит поверх свежего HEAD перед пушем.
             git pull --rebase origin main
             git push origin main
+          else
+            echo "Нет новых файлов для публикации"
           fi
