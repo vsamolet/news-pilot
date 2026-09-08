@@ -1,12 +1,16 @@
 ---
 import { CATEGORIES } from '../lib/categories';
 
-const today = new Date().toLocaleDateString('ru-RU', {
+const rawToday = new Date().toLocaleDateString('ru-RU', {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
   year: 'numeric',
 });
+// Капитализируем только первую букву строки (день недели) — CSS-класс
+// capitalize трогал каждое слово подряд, из-за чего суффикс года "г."
+// превращался в "Г.".
+const today = rawToday.charAt(0).toUpperCase() + rawToday.slice(1);
 
 const shareUrl = new URL(Astro.url.pathname, Astro.site).toString();
 const currentPath = Astro.url.pathname;
@@ -16,7 +20,7 @@ const currentPath = Astro.url.pathname;
   <div class="max-w-6xl mx-auto px-4">
     <div class="flex items-center justify-between py-2 text-xs text-muted border-b border-hairline">
       <div class="flex items-center gap-3">
-        <span class="capitalize">{today}</span>
+        <span>{today}</span>
       </div>
       <div class="flex items-center gap-3">
         <a
