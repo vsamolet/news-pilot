@@ -1,7 +1,7 @@
 ---
 title: "Первый энергоблок АЭС «Аккую» в Турции планируют запустить до конца 2026 года"
 lead: "Глава Минэнерго Турции Алпарслан Байрактар сообщил о планах запустить первый энергоблок АЭС «Аккую» до конца 2026 года."
-pubDate: 2026-09-06T07:36:55.000Z
+pubDate: 2026-09-08T12:04:13.000Z
 category: business
 image: /images/pervyy-energoblok-aes-akkuyu-v-turtsii-planiruyut-zapustit-do-kontsa-2026-goda.webp
 image_credit: "Joshua Kettle"

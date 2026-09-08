@@ -1,7 +1,7 @@
 ---
 title: "Из-за извержения вулкана Анак-Кракатау аэропорт Джакарты приостановил работу"
 lead: "Крупнейший аэропорт Индонезии Сукарно-Хатта в Джакарте приостановил работу из-за распространения пепла после извержения вулкана."
-pubDate: 2026-09-05T23:51:34.000Z
+pubDate: 2026-09-08T11:46:48.000Z
 category: society
 image: /images/iz-za-izverzheniya-vulkana-anak-krakatau-aeroport-dzhakarty-priostanovil-rabotu.webp
 image_credit: "You Le"
