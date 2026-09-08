@@ -8,20 +8,6 @@ const today = new Date().toLocaleDateString('ru-RU', {
   year: 'numeric',
 });
 
-// Статус торговой сессии Мосбиржи — вычисляется по московскому времени сборки
-// страницы (сайт статический, значение обновляется при следующей генерации).
-function getMoexStatus(): string {
-  const now = new Date();
-  const weekday = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', weekday: 'short' }).format(now);
-  const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', hour: 'numeric', hourCycle: 'h23' }).format(now));
-  const minute = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', minute: 'numeric' }).format(now));
-  const isWeekday = weekday !== 'Sat' && weekday !== 'Sun';
-  const minutesOfDay = hour * 60 + minute;
-  const isOpen = isWeekday && minutesOfDay >= 10 * 60 && minutesOfDay < 18 * 60 + 45;
-  return isOpen ? 'Мосбиржа: торги открыты' : 'Мосбиржа: торги закрыты';
-}
-
-const moexStatus = getMoexStatus();
 const shareUrl = new URL(Astro.url.pathname, Astro.site).toString();
 const currentPath = Astro.url.pathname;
 ---
@@ -31,8 +17,6 @@ const currentPath = Astro.url.pathname;
     <div class="flex items-center justify-between py-2 text-xs text-muted border-b border-hairline">
       <div class="flex items-center gap-3">
         <span class="capitalize">{today}</span>
-        <span class="hidden sm:inline text-hairline">&middot;</span>
-        <span class="hidden sm:inline">{moexStatus}</span>
       </div>
       <div class="flex items-center gap-3">
         <a
