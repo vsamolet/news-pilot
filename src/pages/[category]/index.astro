@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { CATEGORIES, categoryLabel } from '../../lib/categories';
+
+export async function getStaticPaths() {
+  return Object.keys(CATEGORIES).map((category) => ({ params: { category } }));
+}
+
+const { category } = Astro.params;
+
+const allNews = (await getCollection('news')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const items = allNews.filter((e) => e.data.category === category);
+const sidebarItems = allNews.slice(0, 6);
+const label = categoryLabel(category!);
+---
+
+<Layout title={label} description={`Последние новости в рубрике «${label}» — Деловой Вестник.`}>
+  <div class="max-w-6xl mx-auto px-4 py-10">
+    <header class="border-b-4 border-ink pb-4 mb-10">
+      <p class="text-xs uppercase tracking-wide text-ink/50 mb-1">
+        <a href="/" class="hover:text-accent">Главная</a> / {label}
+      </p>
+      <h1 class="font-serif text-4xl font-bold">{label}</h1>
+    </header>
+
+    <div class="grid lg:grid-cols-3 gap-x-10 gap-y-12">
+      <section class="lg:col-span-2">
+        {items.length > 0 ? (
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-10">
+            {items.map((entry) => <ArticleCard entry={entry} />)}
+          </div>
+        ) : (
+          <p class="text-ink/60">В этой рубрике пока нет публикаций.</p>
+        )}
+      </section>
+
+      <Sidebar entries={sidebarItems} />
+    </div>
+  </div>
+</Layout>

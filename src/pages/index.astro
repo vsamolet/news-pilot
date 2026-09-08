@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { categoryLabel } from '../lib/categories';
+
+const allNews = (await getCollection('news')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const featured = allNews.find((e) => e.data.featured) ?? allNews[0];
+const rest = allNews.filter((e) => e.id !== featured.id);
+const gridItems = rest.slice(0, 6);
+const sidebarItems = allNews.slice(0, 6);
+
+const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+---
+
+<Layout title="Деловой Вестник">
+  <div class="max-w-6xl mx-auto px-4 py-10">
+    <!-- Top story -->
+    <section class="grid md:grid-cols-2 gap-8 md:gap-12 border-b-4 border-ink pb-10 mb-10">
+      <a href={`/news/${featured.id}/`} class="block bg-ink aspect-[16/10] overflow-hidden">
+        <img
+          src={featured.data.image}
+          alt={featured.data.title}
+          class="w-full h-full object-cover"
+        />
+      </a>
+      <div class="flex flex-col justify-center">
+        <div class="text-xs uppercase tracking-wide font-semibold text-accent mb-3">
+          {categoryLabel(featured.data.category)} &middot; Главная тема
+        </div>
+        <a href={`/news/${featured.id}/`}>
+          <h1 class="font-serif text-3xl md:text-4xl font-bold leading-tight hover:text-accent transition-colors">
+            {featured.data.title}
+          </h1>
+        </a>
+        <p class="mt-4 text-lg text-ink/75 leading-relaxed">{featured.data.lead}</p>
+        <time datetime={featured.data.pubDate.toISOString()} class="mt-4 text-sm text-ink/45">
+          {featuredDate}
+        </time>
+      </div>
+    </section>
+
+    <!-- Grid + sidebar -->
+    <div class="grid lg:grid-cols-3 gap-x-10 gap-y-12">
+      <section class="lg:col-span-2">
+        <h2 class="font-serif text-xl font-bold border-b-2 border-ink pb-2 mb-6">Главные новости</h2>
+        <div class="grid sm:grid-cols-2 gap-x-8 gap-y-10">
+          {gridItems.map((entry) => <ArticleCard entry={entry} />)}
+        </div>
+      </section>
+
+      <Sidebar entries={sidebarItems} />
+    </div>
+  </div>
+</Layout>

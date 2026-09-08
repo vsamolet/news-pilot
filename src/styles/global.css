@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "PT Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "PT Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --color-ink: #1a1a1a;
+  --color-paper: #fbfaf7;
+  --color-accent: #a3231f;
+  --color-hairline: #d8d4cb;
+}
+
+html {
+  background-color: var(--color-paper);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+}
+
+.prose-article {
+  font-family: var(--font-serif);
+}
+
+.prose-article p {
+  margin-top: 1.25em;
+  line-height: 1.8;
+}
+
+.prose-article h2 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+}
+
+.prose-article a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

@@ -1,0 +1,5 @@
+requests
+feedparser
+pillow
+python-dotenv
+trafilatura

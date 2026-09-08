@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+<rect width="1200" height="800" fill="#f4f2ee"/>
+<g stroke="#1a1a1a" stroke-width="2" opacity="0.15">
+<line x1="0" y1="700" x2="1200" y2="700"/>
+<line x1="0" y1="560" x2="1200" y2="560"/>
+<line x1="0" y1="420" x2="1200" y2="420"/>
+<line x1="0" y1="280" x2="1200" y2="280"/>
+<line x1="0" y1="140" x2="1200" y2="140"/>
+</g>
+<g fill="#a3231f">
+<rect x="140" y="480" width="90" height="220"/>
+<rect x="290" y="380" width="90" height="320"/>
+<rect x="440" y="520" width="90" height="180"/>
+<rect x="590" y="300" width="90" height="400"/>
+<rect x="740" y="220" width="90" height="480"/>
+<rect x="890" y="360" width="90" height="340"/>
+</g>
+<polyline points="185,470 335,370 485,500 635,290 785,200 935,340" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+</svg>

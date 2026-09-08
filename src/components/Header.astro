@@ -1,0 +1,35 @@
+---
+import { CATEGORIES } from '../lib/categories';
+
+const today = new Date().toLocaleDateString('ru-RU', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<header class="border-b border-ink bg-paper">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex items-center justify-between py-2 text-xs uppercase tracking-wide text-ink/60 border-b border-hairline">
+      <span class="capitalize">{today}</span>
+      <span>Деловые новости и аналитика</span>
+    </div>
+
+    <div class="py-6 text-center">
+      <a href="/" class="inline-block">
+        <span class="font-serif text-4xl md:text-5xl font-bold tracking-tight text-ink">Деловой Вестник</span>
+      </a>
+      <p class="mt-1 text-xs uppercase tracking-[0.2em] text-ink/50">Экономика &middot; Бизнес &middot; Рынки</p>
+    </div>
+
+    <nav class="border-t border-ink">
+      <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 py-3 text-sm font-semibold uppercase tracking-wide">
+        <li><a href="/" class="hover:text-accent transition-colors">Главная</a></li>
+        {Object.entries(CATEGORIES).map(([slug, label]) => (
+          <li><a href={`/${slug}/`} class="hover:text-accent transition-colors">{label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
