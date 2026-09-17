@@ -42,12 +42,10 @@ accents.forEach((e) => usedIds.add(e.id));
 
 const feedItems = allNews.filter((e) => !usedIds.has(e.id)).slice(0, 6);
 
-// «Главное коротко»: сначала материалы format:'brief', при нехватке —
-// добиваем самыми свежими остальными (позволяем пересечение с лентой,
-// это компактный тикер, а не отдельная лента).
-const briefOnly = allNews.filter((e) => e.data.format === 'brief');
-const briefFallback = allNews.filter((e) => e.data.format !== 'brief');
-const briefItems = [...briefOnly, ...briefFallback].slice(0, 5);
+// «Главное коротко»: только материалы format:'brief'. Пока таких статей
+// нет — секция скрывается целиком (см. условие в разметке ниже), без
+// подмены дублем общей ленты.
+const briefItems = allNews.filter((e) => e.data.format === 'brief').slice(0, 5);
 
 const tickerItems = allNews.slice(0, 10);
 
@@ -114,8 +112,8 @@ const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
         </div>
       </section>
 
-      <div class="space-y-10">
-        <Sidebar entries={briefItems} title="Главное коротко" />
+      <div class="space-y-10 lg:sticky lg:top-6 lg:self-start">
+        {briefItems.length > 0 && <Sidebar entries={briefItems} title="Главное коротко" />}
         <Sidebar entries={tickerItems} title="Картина дня / Молнии" />
       </div>
     </div>

@@ -9,7 +9,7 @@ interface Props {
 const { entries, title = 'Картина дня' } = Astro.props;
 ---
 
-<aside class="lg:sticky lg:top-6">
+<aside>
   <h2 class="font-serif text-lg font-bold border-b-2 border-ink pb-2 mb-1">{title}</h2>
   <ol>
     {entries.map((entry) => (
