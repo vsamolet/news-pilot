@@ -147,6 +147,10 @@ def build_system_prompt(source_name: str) -> str:
 6. Категория (category): economics, business, markets, tech или society — что лучше всего описывает тему.
 7. Подбор визуала: image_query — ровно 2-3 конкретных слова на английском языке, описывающих физический, снимаемый репортажной фотографией объект или сцену по теме статьи (например: "oil refinery", "freight train", "container port", "datacenter servers", "wind turbine", "medical surgery"). Это должно быть что-то, что реально можно сфотографировать в новостном репортаже. КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО использовать абстрактные/художественные термины: "abstract", "art", "texture", "concept", "pattern", "background", "design" и подобные — из-за них Unsplash подсовывает арт-текстуры вместо репортажных фото.
 8. Типографика: ЛЮБОЕ название издания, СМИ, компании или организации, где бы оно ни встретилось в тексте (и в твоей атрибуции, и во всех упоминаниях внутри body, включая иностранные) — всегда в русских кавычках-ёлочках: «Коммерсантъ», «Ведомости», «Bloomberg», «Газпром», «Роснефть», «Jaguar Land Rover». Без кавычек пишутся только общепринятые аббревиатуры и коды: РБК, ТАСС, RT, США, ЕС.
+9. Тип материала (format) — ОБЯЗАТЕЛЬНО выбери один из трёх вариантов, не бери "news" по умолчанию, если текст явно подходит под один из двух других:
+   - "analytics" — выбирай, если в источнике есть ХОТЯ БЫ ОДНО: прогноз на будущее (курса, ставки, цены, показателя), мнение аналитика/эксперта/финансиста о том, что будет дальше, разбор причин и последствий тренда, макроэкономическая статистика с интерпретацией, разбор регуляторной реформы. Ключевые сигналы в тексте источника: "прогноз", "ожидается", "по оценкам", "эксперт считает", "аналитики полагают", "в перспективе", "тренд", "может вырасти/упасть до".
+   - "brief" — выбирай, если это одна сухая цифра/факт без анализа причин и последствий: котировка, разовое кадровое назначение, разовая сделка, отдельный показатель отчётности без прогноза на будущее.
+   - "news" — только если текст не подходит явно ни под один из двух вариантов выше: событие произошло, изложены факты и участники, но нет ни прогноза, ни сведения к одной голой цифре.
 
 Технически важно: в значении body разделяй абзацы двойным переносом строки (\\n\\n) — так, чтобы получилось ровно 4-5 отдельных абзацев по схеме из правила 2, а не один сплошной блок текста.
 
@@ -156,12 +160,16 @@ def build_system_prompt(source_name: str) -> str:
   "lead": "...",
   "body": "...",
   "category": "...",
-  "image_query": "..."
+  "image_query": "...",
+  "format": "news | analytics | brief"
 }}"""
 
 # Категории должны совпадать с src/lib/categories.ts на сайте.
 ALLOWED_CATEGORIES = {"economics", "business", "markets", "tech", "society"}
 DEFAULT_CATEGORY = "society"
+
+# Должно совпадать с z.enum(['news', 'analytics', 'brief']) в content.config.ts.
+ALLOWED_FORMATS = {"news", "analytics", "brief"}
 
 # YandexGPT часто возвращает произвольные русские ярлыки вместо ключей схемы
 # («Экономика», «Новости бизнеса», «Технологии и оборона» и т.п.) — сопоставляем
@@ -614,6 +622,19 @@ def parse_model_json(raw_text: str, source_name: str) -> dict[str, str]:
         )
     parsed["category"] = normalized
 
+    # format необязателен на входе (в отличие от category) — модель иногда его
+    # опускает или возвращает не то значение; в обоих случаях откатываемся на
+    # 'news', совпадает с default в схеме контента (content.config.ts).
+    raw_format = str(parsed.get("format") or "").strip().lower()
+    if raw_format not in ALLOWED_FORMATS:
+        if raw_format:
+            print(
+                f"Инфо: модель вернула неизвестный format {raw_format!r} — использую 'news'.",
+                file=sys.stderr,
+            )
+        raw_format = "news"
+    parsed["format"] = raw_format
+
     body_len = len(parsed["body"].strip())
     if body_len < MIN_BODY_CHARS:
         print(
@@ -745,6 +766,10 @@ def build_markdown(
         f"category: {article['category']}",
         f"image: {image_path}",
     ]
+    # 'news' — значение по умолчанию в схеме (content.config.ts), поле можно не
+    # писать; explicit-запись только для analytics/brief держит файлы чище.
+    if article.get("format") and article["format"] != "news":
+        frontmatter_lines.append(f"format: {article['format']}")
     if image_credit:
         frontmatter_lines.append(f"image_credit: {yaml_quote(image_credit)}")
     if image_credit_url:

@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import AccentCard from '../components/AccentCard.astro';
+import AnalyticsCard from '../components/AnalyticsCard.astro';
 import Sidebar from '../components/Sidebar.astro';
 import { categoryLabel } from '../lib/categories';
 
@@ -23,9 +24,31 @@ const recentPriorityNews = allNews.filter(
 ); // allNews уже отсортирован по убыванию даты — порядок сохраняется после filter
 
 const featured = recentPriorityNews[0] ?? allNews[0];
-const rest = allNews.filter((e) => e.id !== featured.id);
-const accents = rest.slice(0, 3);
-const feedItems = rest.slice(3, 9);
+
+// Единый набор занятых ID — каждый следующий блок ниже выбирает материалы
+// только из того, что ещё не показано выше по странице (кроме сайдбара
+// «Главное коротко»: это компактный тикер, лёгкое пересечение с основной
+// лентой для него нормально, как на реальных новостных сайтах).
+const usedIds = new Set([featured.id]);
+
+// Спецблок «Аналитика»: последние 3 материала format:'analytics', не считая
+// уже показанного в hero. Если таких статей пока нет — секция просто не
+// рендерится (см. условие ниже), без «дыры» на странице.
+const analyticsItems = allNews.filter((e) => e.data.format === 'analytics' && !usedIds.has(e.id)).slice(0, 3);
+analyticsItems.forEach((e) => usedIds.add(e.id));
+
+const accents = allNews.filter((e) => !usedIds.has(e.id)).slice(0, 3);
+accents.forEach((e) => usedIds.add(e.id));
+
+const feedItems = allNews.filter((e) => !usedIds.has(e.id)).slice(0, 6);
+
+// «Главное коротко»: сначала материалы format:'brief', при нехватке —
+// добиваем самыми свежими остальными (позволяем пересечение с лентой,
+// это компактный тикер, а не отдельная лента).
+const briefOnly = allNews.filter((e) => e.data.format === 'brief');
+const briefFallback = allNews.filter((e) => e.data.format !== 'brief');
+const briefItems = [...briefOnly, ...briefFallback].slice(0, 5);
+
 const tickerItems = allNews.slice(0, 10);
 
 const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
@@ -72,7 +95,17 @@ const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
       </div>
     </section>
 
-    <!-- Второй экран: лента аналитики + картина дня -->
+    <!-- Спецблок: Аналитика / Контекст и тренды -->
+    {analyticsItems.length > 0 && (
+      <section class="pb-10 mb-10 border-b border-hairline">
+        <h2 class="font-serif text-xl font-bold border-b-2 border-ink pb-2 mb-6">Контекст и тренды</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+          {analyticsItems.map((entry) => <AnalyticsCard entry={entry} />)}
+        </div>
+      </section>
+    )}
+
+    <!-- Второй экран: лента новостей + боковые колонки -->
     <div class="grid lg:grid-cols-3 gap-x-10 gap-y-12">
       <section class="lg:col-span-2">
         <h2 class="font-serif text-xl font-bold border-b-2 border-ink pb-2 mb-6">Главные новости</h2>
@@ -81,7 +114,10 @@ const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
         </div>
       </section>
 
-      <Sidebar entries={tickerItems} title="Картина дня / Молнии" />
+      <div class="space-y-10">
+        <Sidebar entries={briefItems} title="Главное коротко" />
+        <Sidebar entries={tickerItems} title="Картина дня / Молнии" />
+      </div>
     </div>
   </div>
 </Layout>

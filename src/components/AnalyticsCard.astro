@@ -1,0 +1,41 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { categoryLabel } from '../lib/categories';
+
+interface Props {
+  entry: CollectionEntry<'news'>;
+}
+
+const { entry } = Astro.props;
+const { title, lead, category, image, pubDate } = entry.data;
+
+const dateLabel = pubDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+const wordCount = entry.body?.trim().split(/\s+/).filter(Boolean).length ?? 0;
+const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+---
+
+<article class="group">
+  <a href={`/news/${entry.id}/`} class="block">
+    <div class="overflow-hidden border border-hairline bg-ink/5 aspect-[16/9]">
+      <img
+        src={image}
+        alt={title}
+        loading="lazy"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      />
+    </div>
+    <div class="mt-4">
+      <div class="flex items-center gap-2 text-xs uppercase tracking-wide">
+        <span class="text-accent font-semibold">{categoryLabel(category)}</span>
+        <span class="text-muted">&middot;</span>
+        <span class="text-muted">{dateLabel}</span>
+        <span class="text-muted">&middot;</span>
+        <span class="text-muted">{readingMinutes} мин чтения</span>
+      </div>
+      <h3 class="mt-2 font-serif text-2xl font-bold leading-snug group-hover:text-accent transition-colors">
+        {title}
+      </h3>
+      <p class="mt-2 text-base text-ink/70 leading-relaxed">{lead}</p>
+    </div>
+  </a>
+</article>

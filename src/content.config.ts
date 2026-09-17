@@ -12,6 +12,7 @@ const news = defineCollection({
     image_credit: z.string().optional(),
     image_credit_url: z.string().url().optional(),
     source_url: z.string().url(),
+    format: z.enum(['news', 'analytics', 'brief']).default('news'),
   }),
 });
 
