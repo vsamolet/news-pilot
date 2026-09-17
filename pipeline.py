@@ -63,10 +63,17 @@ load_dotenv()
 # Источники в порядке приоритета: если одна и та же тема встретилась у
 # нескольких источников за один проход, остаётся запись от того, что стоит
 # в списке раньше (см. deduplicate_by_topic).
-SOURCES: list[dict[str, str]] = [
+#
+# pre_filtered=True — у источника уже своя отдельная бизнес/экономическая
+# лента (не общая), поэтому passes_topic_filter для неё не запускается —
+# общий фильтр по ключевым словам рассчитан на ОБЩИЕ ленты и мог бы ошибочно
+# отсеивать часть материалов уже готовой экономической подборки издания.
+SOURCES: list[dict[str, Any]] = [
     {"name": "РБК", "rss_url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss"},
     {"name": "Коммерсантъ", "rss_url": "https://www.kommersant.ru/RSS/news.xml"},
     {"name": "Ведомости", "rss_url": "https://www.vedomosti.ru/rss/news"},
+    {"name": "ТАСС", "rss_url": "https://tass.ru/rss/v2.xml"},
+    {"name": "Известия", "rss_url": "https://iz.ru/xml/rss/economics.xml", "pre_filtered": True},
 ]
 
 ROOT_DIR = Path(__file__).resolve().parent
@@ -201,18 +208,31 @@ BUSINESS_CATEGORY_KEYWORDS = [
 
 # Если рубрика неопределённая/общая ("Общество", "Новости" и т.п.) — решаем по
 # ключевым словам в заголовке+анонсе: похоже это на деловую новость или нет.
-BUSINESS_TEXT_KEYWORDS = [
+# "завод"/"прибыл" — через regex, а не голую подстроку: простое "in" ловило
+# ложные срабатывания на обычных глаголах ("Гуцан прибыл в Минск" → "прибыл",
+# "заводить собак" → "завод") — нашлось на реальных новостях ТАСС при
+# подключении источника. Негативный lookahead отсекает глагольные формы
+# ("заводить/заводит/заводят/заводя"), оставляя только формы существительного
+# ("завод/завода/заводе/заводы/..."); "прибыл[ьи]" ловит "прибыль"/"прибыли",
+# но не глагол "прибыл" (приехал).
+BUSINESS_TEXT_KEYWORDS: list[str | re.Pattern] = [
     "компани", "бизнес", "рынок", "рынка", "рынке", "рынку", "цена", "цены", "ценах",
     "тариф", "банк", "рубл", "доллар", "инвестор", "инвестиц", "экономик", "налог",
-    "зарплат", "кредит", "ипотек", "акци", "бирж", "выручк", "прибыл", "убыт",
+    "зарплат", "кредит", "ипотек", "акци", "бирж", "выручк", re.compile(r"прибыл[ьи]"), "убыт",
     "капитал", "миллиард", "миллион", "трлн", "триллион", "поставк",
-    "экспорт", "импорт", "производств", "завод", "выпуск", "сделк", "контракт",
+    "экспорт", "импорт", "производств", re.compile(r"завод(?![ия])"), "выпуск", "сделк", "контракт",
     "ставк", "ввп", "инфляц", "долг", "бюджет", "холдинг", "ритейл", "магазин",
 ]
 
 
-def _has_any(text: str, keywords: list[str]) -> bool:
-    return any(keyword in text for keyword in keywords)
+def _has_any(text: str, keywords: list[str | re.Pattern]) -> bool:
+    for keyword in keywords:
+        if isinstance(keyword, re.Pattern):
+            if keyword.search(text):
+                return True
+        elif keyword in text:
+            return True
+    return False
 
 
 def passes_topic_filter(entry: Any) -> bool:
@@ -322,7 +342,10 @@ def fetch_fresh_entries_all_sources(history: set[str]) -> list[Any]:
             continue
 
         new_entries = [e for e in feed.entries if e.get("link") and e.get("link") not in history]
-        fresh = [e for e in new_entries if passes_topic_filter(e)]
+        if source.get("pre_filtered"):
+            fresh = new_entries
+        else:
+            fresh = [e for e in new_entries if passes_topic_filter(e)]
         filtered_out = len(new_entries) - len(fresh)
         for entry in fresh:
             entry["source_name"] = source["name"]
