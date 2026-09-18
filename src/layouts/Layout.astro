@@ -10,8 +10,8 @@ interface Props {
   jsonLd?: Record<string, unknown>;
 }
 
-const { title, description = 'Деловой Вестник — новости экономики, политики и рынков.', image, jsonLd } = Astro.props;
-const siteName = 'Деловой Вестник';
+const { title, description = 'Рынки и Компании — информационно-аналитическое издание о рынках капитала, отраслях и корпоративных стратегиях.', image, jsonLd } = Astro.props;
+const siteName = 'Рынки и Компании';
 const pageTitle = title === siteName ? title : `${title} — ${siteName}`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImage = image ? new URL(image, Astro.site).toString() : undefined;

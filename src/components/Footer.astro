@@ -5,8 +5,13 @@ const year = new Date().getFullYear();
 
 <footer class="mt-16 border-t border-hairline">
   <div class="max-w-6xl mx-auto px-4 py-10">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-      <p class="font-serif text-lg font-bold text-ink">Деловой Вестник</p>
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+      <div>
+        <p class="font-serif text-lg font-bold text-ink">Рынки и Компании</p>
+        <p class="mt-1 text-sm text-muted max-w-md">
+          Информационно-аналитическое издание о рынках капитала, отраслях и корпоративных стратегиях.
+        </p>
+      </div>
       <nav>
         <ul class="flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
           {Object.entries(CATEGORIES).map(([slug, label]) => (
@@ -15,9 +20,16 @@ const year = new Date().getFullYear();
         </ul>
       </nav>
     </div>
-    <div class="mt-8 pt-6 border-t border-hairline flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted">
-      <span>&copy; {year} Деловой Вестник. Все права защищены.</span>
-      <span>Новости экономики, бизнеса и финансовых рынков.</span>
+
+    <div class="mt-8 pt-6 border-t border-hairline flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
+      <a href="/about/#project" class="text-ink/80 hover:text-accent transition-colors">О проекте</a>
+      <a href="/about/#standards" class="text-ink/80 hover:text-accent transition-colors">Редакционные стандарты</a>
+      <a href="/about/#contacts" class="text-ink/80 hover:text-accent transition-colors">Контакты</a>
+      <a href="mailto:editorial@marketsco.ru" class="text-ink/80 hover:text-accent transition-colors">editorial@marketsco.ru</a>
+    </div>
+
+    <div class="mt-6 pt-6 border-t border-hairline text-xs text-muted">
+      <span>&copy; {year} «Рынки и Компании». Все права защищены.</span>
     </div>
   </div>
 </footer>

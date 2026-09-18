@@ -1,0 +1,90 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const description =
+  'Редакционные стандарты, структура редакции и контакты «Рынки и Компании» — независимого делового издания о рынках капитала, отраслях и корпоративных стратегиях.';
+---
+
+<Layout title="О проекте" description={description}>
+  <div class="max-w-3xl mx-auto px-4 py-10">
+    <header class="pb-6 mb-10 border-b border-hairline">
+      <p class="text-xs uppercase tracking-wide text-muted mb-1">
+        <a href="/" class="hover:text-accent">Главная</a> / О проекте
+      </p>
+      <h1 class="font-serif text-4xl font-bold">О проекте</h1>
+      <p class="mt-3 text-lg font-serif text-ink/70 leading-relaxed">
+        Информационно-аналитическое издание о рынках капитала, отраслях и корпоративных стратегиях.
+      </p>
+    </header>
+
+    <nav class="mb-12 text-sm border-b border-hairline pb-8" aria-label="Разделы страницы">
+      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+        <li><a href="#project" class="text-accent hover:underline underline-offset-2">О проекте</a></li>
+        <li><a href="#standards" class="text-accent hover:underline underline-offset-2">Редакционные стандарты</a></li>
+        <li><a href="#structure" class="text-accent hover:underline underline-offset-2">Структура редакции</a></li>
+        <li><a href="#contacts" class="text-accent hover:underline underline-offset-2">Контакты</a></li>
+        <li><a href="#citation" class="text-accent hover:underline underline-offset-2">Правила цитирования</a></li>
+      </ul>
+    </nav>
+
+    <article class="prose-article max-w-none text-base text-ink/90">
+      <section id="project">
+        <h2 class="font-serif text-2xl font-bold">О проекте</h2>
+        <p>
+          «Рынки и Компании» (marketsco.ru) — независимое цифровое деловое издание, специализирующееся
+          на мониторинге макроэкономической ситуации, отраслевых рынков и деятельности ведущих корпораций.
+          Издание консолидирует проверенные факты первичных источников, данные раскрытия эмитентов,
+          официальную регуляторную статистику и оценки участников рынка.
+        </p>
+      </section>
+
+      <section id="standards">
+        <h2 class="font-serif text-2xl font-bold">Редакционные стандарты и фактчекинг</h2>
+        <ul class="mt-6 space-y-4 list-disc pl-5">
+          <li>
+            <strong>Верификация информации:</strong> приоритет официальным раскрытиям, реестрам,
+            регуляторным актам и сообщениям ведущих информационных агентств.
+          </li>
+          <li>
+            <strong>Разделение фактуры и мнений:</strong> чёткое разграничение подтверждённых рыночных
+            событий, статистических рядов и экспертных оценок.
+          </li>
+          <li>
+            <strong>Баланс и полнота:</strong> освещение ключевых корпоративных действий и регуляторных
+            изменений с предоставлением необходимого контекста.
+          </li>
+        </ul>
+      </section>
+
+      <section id="structure">
+        <h2 class="font-serif text-2xl font-bold">Структура редакции</h2>
+        <p>
+          Работа издания организована по профильным направлениям: служба корпоративных новостей, отдел
+          макроэкономики и рынков капитала, сектор аналитической обработки данных. Материалы выпускаются
+          объединённым пулом профильных редакторов.
+        </p>
+      </section>
+
+      <section id="contacts">
+        <h2 class="font-serif text-2xl font-bold">Контакты и взаимодействие</h2>
+        <p>
+          Единый адрес для пресс-релизов, экспертных комментариев, вопросов партнёрства и правовой
+          информации:
+        </p>
+        <p class="mt-2">
+          <a href="mailto:editorial@marketsco.ru" class="font-semibold">editorial@marketsco.ru</a>
+        </p>
+        <p class="mt-2 text-sm text-muted">(все входящие обращения обрабатываются дежурным редактором).</p>
+      </section>
+
+      <section id="citation">
+        <h2 class="font-serif text-2xl font-bold">Правила цитирования</h2>
+        <p>
+          Использование материалов сетевого издания «Рынки и Компании» допускается при обязательном
+          наличии прямой, открытой для индексации гиперссылки на исходную публикацию на marketsco.ru.
+          Искажение контекста и исходных числовых данных не допускается.
+        </p>
+      </section>
+    </article>
+  </div>
+</Layout>

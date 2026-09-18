@@ -17,7 +17,7 @@ function toRFC822(date: Date): string {
 }
 
 export const GET: APIRoute = async ({ site }) => {
-  const siteUrl = site ?? new URL('https://delovoy-vestnik.ru');
+  const siteUrl = site ?? new URL('https://marketsco.ru');
   const entries = (await getCollection('news')).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
   );
@@ -45,9 +45,9 @@ export const GET: APIRoute = async ({ site }) => {
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:yandex="http://news.yandex.ru" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
-    <title>Деловой Вестник</title>
+    <title>Рынки и Компании</title>
     <link>${escapeXml(siteUrl.toString())}</link>
-    <description>Новости экономики, политики и финансовых рынков.</description>
+    <description>Информационно-аналитическое издание о рынках капитала, отраслях и корпоративных стратегиях.</description>
     <language>ru</language>
     <lastBuildDate>${toRFC822(new Date())}</lastBuildDate>${items.join('')}
   </channel>
