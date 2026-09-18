@@ -20,6 +20,13 @@
    порождал статьи ни о чём — см. ThinSourceError).
 6. Пересказывает новость через YandexGPT API (строгий JSON-ответ, сухой
    фактологический рерайт без домыслов, с атрибуцией конкретного источника).
+6.1. Прогоняет рерайт через гейт уникальности (scripts/check_plagiarism.py,
+   см. generate_unique_article): похожесть на оригинал по 3-/4-словным
+   шинглам выше PLAGIARISM_SIMILARITY_THRESHOLD (20%) или отсутствие
+   атрибуции источника в тексте — статья отправляется на повторную
+   генерацию со штрафной репликой. После MAX_UNIQUENESS_ATTEMPTS (2) неудачных
+   попыток новость пропускается целиком (UniquenessCheckFailedError) — без
+   сохранения файла и без отметки в publish_log.json.
 7. Ищет и скачивает иллюстрацию через Unsplash API, конвертирует в WebP.
 8. Сохраняет готовую статью в src/content/news/<slug>.md с фронтматтером,
    совместимым со схемой контент-коллекции Astro-сайта.
@@ -77,6 +84,10 @@ SOURCES: list[dict[str, Any]] = [
 ]
 
 ROOT_DIR = Path(__file__).resolve().parent
+
+sys.path.insert(0, str(ROOT_DIR / "scripts"))
+from check_plagiarism import check_plagiarism  # noqa: E402 — путь добавлен строкой выше
+
 HISTORY_PATH = ROOT_DIR / "history.json"
 PUBLISH_LOG_PATH = ROOT_DIR / "publish_log.json"
 IMAGES_DIR = ROOT_DIR / "public" / "images"
@@ -108,6 +119,15 @@ UNSPLASH_RANDOM_PHOTO_URL = "https://api.unsplash.com/photos/random"
 
 MIN_FULL_TEXT_CHARS = 500  # ниже этого порога — пропускаем новость целиком, не тратим токены на GPT
 MIN_BODY_CHARS = 1200  # ориентир для информационного сообщения о длине (не требование — короткая заметка это ок)
+
+# Порог похожести рерайта на оригинал (см. scripts/check_plagiarism.py) — выше
+# него статья считается риском по авторскому праву и не публикуется как есть.
+PLAGIARISM_SIMILARITY_THRESHOLD = 0.2
+# Сколько раз пробуем сгенерировать уникальный рерайт для ОДНОЙ новости,
+# прежде чем сдаться и пропустить её (1 обычный запрос + догенерации со
+# штрафной репликой). Не путать с MAX_ATTEMPTS_PER_RUN — тот считает разные
+# новости за проход, этот — попытки переписать одну и ту же.
+MAX_UNIQUENESS_ATTEMPTS = 2
 
 BROWSER_USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -518,12 +538,24 @@ class ThinSourceError(Exception):
     пропущена без обращения к YandexGPT (см. fetch_full_text)."""
 
 
-def build_source_material(entry: Any) -> str:
+class UniquenessCheckFailedError(Exception):
+    """Рерайт не прошёл проверку уникальности (check_plagiarism) и/или не
+    содержит атрибуции первоисточника даже после MAX_UNIQUENESS_ATTEMPTS
+    попыток — новость пропускается целиком, см. generate_unique_article."""
+
+
+def build_source_material(entry: Any) -> tuple[str, str]:
     """Готовит текст для передачи модели: строго полный текст первоисточника.
     Больше НЕ откатывается на анонс из RSS — короткий анонс, растянутый
     моделью до "нормы" объёма, был источником статей ни о чём (см. историю
     правок). Если полный текст недоступен/слишком короткий — поднимает
-    ThinSourceError, чтобы вызывающий код пропустил новость целиком."""
+    ThinSourceError, чтобы вызывающий код пропустил новость целиком.
+
+    Возвращает (source_material, full_text) — source_material идёт в промпт
+    модели как есть, а full_text отдельно нужен уникальностной проверке
+    (check_plagiarism сравнивает рерайт именно с текстом первоисточника, а не
+    с обёрткой "Источник: ...\\nЗаголовок: ...", которая в самой статье не
+    появляется и только зашумила бы сравнение)."""
     title = (entry.get("title") or "").strip()
     link = entry.get("link") or ""
     source_name = entry.get("source_name") or "источник"
@@ -534,11 +566,12 @@ def build_source_material(entry: Any) -> str:
             f"Не удалось получить достаточно текста первоисточника (порог {MIN_FULL_TEXT_CHARS} симв.)."
         )
 
-    return (
+    source_material = (
         f"Источник: {source_name}\n"
         f"Заголовок исходной новости: {title}\n\n"
         f"Текст:\n{full_text}"
     )
+    return source_material, full_text
 
 
 def entry_pub_date(entry: Any) -> datetime:
@@ -657,6 +690,66 @@ def parse_model_json(raw_text: str, source_name: str) -> dict[str, str]:
         )
 
     return parsed
+
+
+def generate_unique_article(
+    source_material: str,
+    full_text: str,
+    source_name: str,
+    max_attempts: int = MAX_UNIQUENESS_ATTEMPTS,
+) -> dict[str, str]:
+    """Генерирует рерайт через YandexGPT и прогоняет его через гейт
+    уникальности (check_plagiarism + наличие атрибуции) до сохранения.
+
+    При провале гейта — до max_attempts попыток; каждый повторный запрос
+    получает ту же исходную заметку плюс штрафную реплику с требованием
+    переписать текст. Если уникальность так и не достигнута — поднимает
+    UniquenessCheckFailedError: вызывающий код (process_entry) должен
+    пропустить новость целиком, не сохраняя .md/.webp и не фиксируя её в
+    publish_log.json (см. run_once — там исключение просто логируется, и
+    цикл переходит к следующему кандидату из RSS)."""
+    attempt_material = source_material
+    last_similarity_percent: float | None = None
+    last_has_attribution: bool | None = None
+
+    for attempt in range(1, max_attempts + 1):
+        print(f"Отправляю текст в YandexGPT (попытка {attempt}/{max_attempts})...")
+        article = call_yandex_gpt(attempt_material, source_name)
+
+        similarity = check_plagiarism(full_text, article["body"], threshold=PLAGIARISM_SIMILARITY_THRESHOLD)
+        has_attribution = _find_attribution_paragraph(article["body"], source_name) is not None
+        last_similarity_percent, last_has_attribution = similarity.similarity_percent, has_attribution
+
+        print(
+            f"Проверка уникальности: {similarity.status} (похожесть {similarity.similarity_percent}%, "
+            f"порог {round(PLAGIARISM_SIMILARITY_THRESHOLD * 100, 1)}%), "
+            f"атрибуция: {'найдена' if has_attribution else 'НЕ найдена'}."
+        )
+
+        if similarity.status == "PASS" and has_attribution:
+            return article
+
+        if attempt < max_attempts:
+            reasons = []
+            if similarity.status == "FAIL":
+                reasons.append(f"похожесть на оригинал {similarity.similarity_percent}%")
+            if not has_attribution:
+                reasons.append(f"нет атрибуции источника «{source_name}»")
+            print(
+                f"Уникальность не пройдена ({'; '.join(reasons)}) — повторный запрос со штрафной репликой...",
+                file=sys.stderr,
+            )
+            attempt_material = (
+                f"{source_material}\n\n"
+                "ВАЖНО: твой прошлый ответ был слишком похож на оригинал (копировал синтаксис). "
+                "Перепиши полностью своими словами в формате сухой аналитической сводки "
+                f"информагентства, обязательно укажи источник фактуры («{source_name}»)."
+            )
+
+    raise UniquenessCheckFailedError(
+        f"уникальность рерайта не устранена после {max_attempts} попыток "
+        f"(похожесть {last_similarity_percent}%, атрибуция {'есть' if last_has_attribution else 'нет'})."
+    )
 
 
 # --- Unsplash -----------------------------------------------------------------
@@ -798,10 +891,9 @@ def process_entry(entry: Any, history: set[str]) -> Path:
     source_name = entry.get("source_name") or "источник"
     print(f"Новая новость ({source_name}): {entry.title}\n{entry.link}")
 
-    source_material = build_source_material(entry)
+    source_material, full_text = build_source_material(entry)
 
-    print("Отправляю текст в YandexGPT...")
-    article = call_yandex_gpt(source_material, source_name)
+    article = generate_unique_article(source_material, full_text, source_name)
 
     base_slug = slugify(article["title"])
     slug = unique_slug(base_slug)
