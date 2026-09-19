@@ -170,7 +170,14 @@ def build_system_prompt(source_name: str) -> str:
 4. СТИЛЬ: строго от третьего лица, сухим фактологическим языком информагентств (ТАСС, РБК, Интерфакс). Категорически запрещены вступительные и заключительные фразы от первого лица или обращения к читателю — "в этой статье мы рассмотрим", "подводя итог, отметим", "как мы видим", "стоит отметить, что" и подобные. Никаких оценочных штампов.
 5. ЭТО РЕРАЙТ, А НЕ КОПИРОВАНИЕ — юридически значимое правило, не стилистическая рекомендация. Перескажи своими словами: порядок изложения, структура предложений и формулировки должны заметно отличаться от исходного текста, дословное сходство с оригиналом недопустимо. Категорически запрещено копировать синтаксическую структуру исходного предложения (тот же порядок подлежащего/сказуемого/оборотов, тот же способ соединения частей) и запрещено использовать более 3 слов подряд из исходного текста. Исключение из правила "3 слов подряд" — только официальные названия компаний и организаций, номера и обозначения ГОСТов/стандартов/законов и имена/должности персоналий: их можно приводить дословно. Дословно также можно сохранять цифры, даты и прямые цитаты в кавычках — весь остальной текст перефразируй полностью, включая порядок изложения фактов внутри предложения.
 6. Категория (category): economics, business, markets, tech или society — что лучше всего описывает тему.
-7. Подбор визуала: image_query — ровно 2-3 конкретных слова на английском языке, описывающих физический, снимаемый репортажной фотографией объект или сцену по теме статьи (например: "oil refinery", "freight train", "container port", "datacenter servers", "wind turbine", "medical surgery"). Это должно быть что-то, что реально можно сфотографировать в новостном репортаже. КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО использовать абстрактные/художественные термины: "abstract", "art", "texture", "concept", "pattern", "background", "design" и подобные — из-за них Unsplash подсовывает арт-текстуры вместо репортажных фото.
+7. Подбор визуала: image_query — ровно 2-3 конкретных слова на английском языке для поиска тематической иллюстрации. Это должен быть физический, снимаемый репортажной фотографией объект или сцена ИЗ СУТИ КОНКРЕТНОЙ НОВОСТИ, а не общий символ её рубрики/отрасли в целом — например, для новости о ценах на зерно нужно "wheat field" или "grain silo", а НЕ "stock exchange trading floor" (это правильный выбор для новости про биржевые торги, но не про сельское хозяйство). Ориентируйся по теме источника:
+   - сельское хозяйство, зерно, урожай -> wheat field, harvest, grain cargo, farming
+   - топливо, нефть, газ -> oil refinery, fuel tanker, pipeline
+   - автопром, логистика, перевозки -> container ship, cargo truck, warehouse
+   - IT, технологии, ПО -> data center, server rack, circuit board
+   - заявления чиновников, итоги совещаний, госполитика -> government press conference, official podium, business summit (без упоминания или описания конкретных лиц)
+   - для остальных тем (металлургия, недвижимость, розница, банки и т.д.) — по аналогии: конкретный физический объект/сцена, которые реально фигурируют в СУТИ этой новости.
+   Это должно быть что-то, что реально можно сфотографировать в репортаже. КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО использовать абстрактные/художественные термины: "abstract", "art", "texture", "concept", "pattern", "background", "design" и подобные — из-за них Unsplash подсовывает арт-текстуры вместо репортажных фото.
 8. Типографика: ЛЮБОЕ название издания, СМИ, компании или организации, где бы оно ни встретилось в тексте (и в твоей атрибуции, и во всех упоминаниях внутри body, включая иностранные) — всегда в русских кавычках-ёлочках: «Коммерсантъ», «Ведомости», «Bloomberg», «Газпром», «Роснефть», «Jaguar Land Rover». Без кавычек пишутся только общепринятые аббревиатуры и коды: РБК, ТАСС, RT, США, ЕС.
 9. Тип материала (format) — ОБЯЗАТЕЛЬНО выбери один из трёх вариантов, не бери "news" по умолчанию, если текст явно подходит под один из двух других:
    - "analytics" — выбирай, если в источнике есть ХОТЯ БЫ ОДНО: прогноз на будущее (курса, ставки, цены, показателя), мнение аналитика/эксперта/финансиста о том, что будет дальше, разбор причин и последствий тренда, макроэкономическая статистика с интерпретацией, разбор регуляторной реформы. Ключевые сигналы в тексте источника: "прогноз", "ожидается", "по оценкам", "эксперт считает", "аналитики полагают", "в перспективе", "тренд", "может вырасти/упасть до".
@@ -192,6 +199,18 @@ def build_system_prompt(source_name: str) -> str:
 # Категории должны совпадать с src/lib/categories.ts на сайте.
 ALLOWED_CATEGORIES = {"economics", "business", "markets", "tech", "society"}
 DEFAULT_CATEGORY = "society"
+
+# Запасной запрос к Unsplash по категории статьи — используется, только если
+# и сгенерированный моделью image_query, и его укороченная версия (первая
+# фраза до запятой) не дали результатов на Unsplash (см. fetch_unsplash_image).
+CATEGORY_FALLBACK_QUERY = {
+    "economics": "central bank building",
+    "business": "corporate office building",
+    "markets": "stock exchange trading floor",
+    "tech": "data center servers",
+    "society": "city street crowd",
+}
+DEFAULT_FALLBACK_QUERY = "business office"
 
 # Должно совпадать с z.enum(['news', 'analytics', 'brief']) в content.config.ts.
 ALLOWED_FORMATS = {"news", "analytics", "brief"}
@@ -777,11 +796,20 @@ def _search_unsplash_photo(query: str) -> dict:
 UNSPLASH_IMAGE_PARAMS = "auto=format&fit=crop&w=1200&q=80"
 
 
-def fetch_unsplash_image(query: str, slug: str) -> tuple[str, str | None, str | None]:
+def fetch_unsplash_image(query: str, slug: str, category: str = "") -> tuple[str, str | None, str | None]:
     """Подбирает фото на Unsplash и возвращает (CDN-ссылка с параметрами
     обработки, имя_автора, ссылка_на_профиль_автора) — имя/ссылка нужны для
     подписи "Фото: {автор} / Unsplash" на странице статьи; берутся из поля
     "user" ответа Unsplash API (обязательное по их правилам атрибуции).
+
+    Порядок попыток при "пустом" ответе Unsplash (404 на /photos/random):
+    1. query как есть (сгенерирован моделью, см. build_system_prompt, правило 7);
+    2. первая фраза до запятой в query — составные запросы вида "gold trading,
+       stock exchange" иногда не дают результатов целиком;
+    3. запасной запрос по категории статьи (CATEGORY_FALLBACK_QUERY) — на
+       случай, если сама модель сгенерировала слишком специфичный/редкий
+       запрос. Это ПОСЛЕДНИЙ рубеж, а не основной механизм — основная
+       релевантность фото обеспечивается качеством query от модели.
 
     Файл НЕ скачивается на диск: используется прямая ссылка на CDN Unsplash
     (см. UNSPLASH_IMAGE_PARAMS) — параметр slug сохранён в сигнатуре для
@@ -789,18 +817,24 @@ def fetch_unsplash_image(query: str, slug: str) -> tuple[str, str | None, str | 
     if not UNSPLASH_ACCESS_KEY:
         raise RuntimeError("UNSPLASH_ACCESS_KEY не задан в .env")
 
-    try:
-        photo = _search_unsplash_photo(query)
-    except requests.HTTPError as exc:
-        if exc.response is None or exc.response.status_code != 404:
-            raise
-        # Составные запросы вида "gold trading, stock exchange" иногда не дают
-        # результатов на /photos/random — пробуем первую фразу до запятой.
-        fallback_query = query.split(",")[0].strip()
-        if not fallback_query or fallback_query == query:
-            raise
-        print(f"Unsplash не нашёл фото по «{query}», пробую «{fallback_query}»...")
-        photo = _search_unsplash_photo(fallback_query)
+    attempts = [query]
+    comma_fallback = query.split(",")[0].strip()
+    if comma_fallback and comma_fallback != query:
+        attempts.append(comma_fallback)
+    category_fallback = CATEGORY_FALLBACK_QUERY.get(category, DEFAULT_FALLBACK_QUERY)
+    if category_fallback not in attempts:
+        attempts.append(category_fallback)
+
+    photo = None
+    for i, attempt_query in enumerate(attempts):
+        is_last = i == len(attempts) - 1
+        try:
+            photo = _search_unsplash_photo(attempt_query)
+            break
+        except requests.HTTPError as exc:
+            if exc.response is None or exc.response.status_code != 404 or is_last:
+                raise
+            print(f"Unsplash не нашёл фото по «{attempt_query}», пробую «{attempts[i + 1]}»...")
     if isinstance(photo, list):  # на случай, если Unsplash вернёт список
         photo = photo[0]
 
@@ -907,7 +941,9 @@ def process_entry(entry: Any, history: set[str]) -> Path:
     slug = unique_slug(base_slug)
 
     print(f"Ищу изображение по запросу «{article['image_query']}» на Unsplash...")
-    image_path, image_credit, image_credit_url = fetch_unsplash_image(article["image_query"], slug)
+    image_path, image_credit, image_credit_url = fetch_unsplash_image(
+        article["image_query"], slug, article["category"]
+    )
 
     # Важно: НЕ entry_pub_date(entry) здесь. Та функция берёт дату публикации
     # у первоисточника — из-за большого бэклога RSS новость может быть
