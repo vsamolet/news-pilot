@@ -27,7 +27,15 @@
    генерацию со штрафной репликой. После MAX_UNIQUENESS_ATTEMPTS (2) неудачных
    попыток новость пропускается целиком (UniquenessCheckFailedError) — без
    сохранения файла и без отметки в publish_log.json.
-7. Ищет и скачивает иллюстрацию через Unsplash API, конвертирует в WebP.
+7. Подбирает иллюстрацию через Unsplash API и сохраняет прямую CDN-ссылку
+   (с параметрами динамической обработки Unsplash — auto=format, fit=crop,
+   w, q) в frontmatter статьи. Картинка НЕ скачивается и не хранится в
+   репозитории — см. fetch_unsplash_image и историю правок: раньше файлы
+   скачивались и конвертировались в WebP в public/images/, но раздача этих
+   файлов через Cloudflare Workers Static Assets зависала на стриминге тела
+   ответа для бинарников (воспроизводилось на всех сетях/регионах, включая
+   VPN, — похоже на баг/деградацию самого сервиса), поэтому вернулись к
+   прямому хотлинку на CDN Unsplash.
 8. Сохраняет готовую статью в src/content/news/<slug>.md с фронтматтером,
    совместимым со схемой контент-коллекции Astro-сайта.
 
@@ -45,7 +53,6 @@
 from __future__ import annotations
 
 import argparse
-import io
 import json
 import re
 import sys
@@ -59,7 +66,6 @@ import feedparser
 import requests
 import trafilatura
 from dotenv import load_dotenv
-from PIL import Image
 
 import os
 
@@ -90,7 +96,6 @@ from check_plagiarism import check_plagiarism  # noqa: E402 — путь доб�
 
 HISTORY_PATH = ROOT_DIR / "history.json"
 PUBLISH_LOG_PATH = ROOT_DIR / "publish_log.json"
-IMAGES_DIR = ROOT_DIR / "public" / "images"
 CONTENT_DIR = ROOT_DIR / "src" / "content" / "news"
 
 # Сколько статей допускается публиковать за календарный месяц (защита бюджета
@@ -766,11 +771,21 @@ def _search_unsplash_photo(query: str) -> dict:
     return response.json()
 
 
+# Параметры динамической обработки изображений Unsplash (imgix-based CDN) —
+# добавляются к "raw"-ссылке фото вместо скачивания файла целиком. См.
+# https://unsplash.com/documentation#dynamically-resizable-images
+UNSPLASH_IMAGE_PARAMS = "auto=format&fit=crop&w=1200&q=80"
+
+
 def fetch_unsplash_image(query: str, slug: str) -> tuple[str, str | None, str | None]:
-    """Скачивает фото с Unsplash и сохраняет как WebP. Возвращает
-    (путь_к_файлу, имя_автора, ссылка_на_профиль_автора) — имя/ссылка нужны
-    для подписи "Фото: {автор} / Unsplash" на странице статьи; берутся из
-    поля "user" ответа Unsplash API (обязательное по их правилам атрибуции)."""
+    """Подбирает фото на Unsplash и возвращает (CDN-ссылка с параметрами
+    обработки, имя_автора, ссылка_на_профиль_автора) — имя/ссылка нужны для
+    подписи "Фото: {автор} / Unsplash" на странице статьи; берутся из поля
+    "user" ответа Unsplash API (обязательное по их правилам атрибуции).
+
+    Файл НЕ скачивается на диск: используется прямая ссылка на CDN Unsplash
+    (см. UNSPLASH_IMAGE_PARAMS) — параметр slug сохранён в сигнатуре для
+    совместимости вызова из process_entry, но самим URL не используется."""
     if not UNSPLASH_ACCESS_KEY:
         raise RuntimeError("UNSPLASH_ACCESS_KEY не задан в .env")
 
@@ -788,26 +803,19 @@ def fetch_unsplash_image(query: str, slug: str) -> tuple[str, str | None, str | 
         photo = _search_unsplash_photo(fallback_query)
     if isinstance(photo, list):  # на случай, если Unsplash вернёт список
         photo = photo[0]
-    image_url = photo["urls"]["regular"]
+
+    raw_url = photo["urls"]["raw"]
+    separator = "&" if "?" in raw_url else "?"
+    image_url = f"{raw_url}{separator}{UNSPLASH_IMAGE_PARAMS}"
 
     user = photo.get("user") or {}
     credit_name = user.get("name")
     credit_url = (user.get("links") or {}).get("html")
     if credit_url:
         # UTM-параметры атрибуции — требование Unsplash API Guidelines.
-        credit_url += ("&" if "?" in credit_url else "?") + "utm_source=delovoy-vestnik&utm_medium=referral"
+        credit_url += ("&" if "?" in credit_url else "?") + "utm_source=marketsco&utm_medium=referral"
 
-    image_response = requests.get(image_url, timeout=REQUEST_TIMEOUT)
-    image_response.raise_for_status()
-
-    IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-    filename = f"{slug}.webp"
-    filepath = IMAGES_DIR / filename
-
-    image = Image.open(io.BytesIO(image_response.content)).convert("RGB")
-    image.save(filepath, "WEBP", quality=85)
-
-    return f"/images/{filename}", credit_name, credit_url
+    return image_url, credit_name, credit_url
 
 
 # --- Markdown -------------------------------------------------------------------
@@ -857,7 +865,7 @@ def build_markdown(
         f"lead: {yaml_quote(article['lead'].strip())}",
         f"pubDate: {pub_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')}",
         f"category: {article['category']}",
-        f"image: {image_path}",
+        f"image: {yaml_quote(image_path)}",
     ]
     # 'news' — значение по умолчанию в схеме (content.config.ts), поле можно не
     # писать; explicit-запись только для analytics/brief держит файлы чище.
