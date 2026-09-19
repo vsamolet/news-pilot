@@ -3,9 +3,9 @@ title: "В правительстве предложили обязать биз
 lead: "В России могут ввести обязательное использование полностью российских моделей искусственного интеллекта в определённых сферах."
 pubDate: 2026-09-10T12:03:41.000Z
 category: business
-image: /images/v-pravitelstve-predlozhili-obyazat-biznes-ispolzovat-suverennye-modeli-ii.webp
-image_credit: "BoliviaInteligente"
-image_credit_url: "https://unsplash.com/@boliviainteligente?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1774876203004-461433250ada?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE2NTk5fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "MChe Lee"
+image_credit_url: "https://unsplash.com/@mclee?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8938534"
 ---
 Как сообщает «Коммерсантъ», в правительстве подготовили проект постановления, согласно которому организации обяжут выбирать суверенные ИИ-модели (полностью российские) перед национальными (с открытыми компонентами), если их цена не дороже более чем в 1,5 раза. Такая мера обсуждалась в рабочей группе по вопросам регулирования ИИ в РФ в конце августа, а само предложение поступило от «Сбера».

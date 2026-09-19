@@ -3,9 +3,9 @@ title: "«Аэрофлот» анонсировал сроки получени�
 lead: "Группа «Аэрофлот» до конца 2032 года получит 108 самолетов МС-21."
 pubDate: 2026-09-09T18:03:29.000Z
 category: business
-image: /images/aeroflot-anonsiroval-sroki-polucheniya-pervyh-ms-21.webp
-image_credit: "Forsaken Films"
-image_credit_url: "https://unsplash.com/@forsakenfilmslimited?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1686100511314-7d4a52987f2f?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODExMzg0fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "JIRAN FAMILY"
+image_credit_url: "https://unsplash.com/@jiranfamily?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8937700"
 ---
 Группа «Аэрофлот» планирует получить 108 новых среднемагистральных узкофюзеляжных пассажирских самолетов МС-21 до конца 2032 года. Об этом сообщил гендиректор «Аэрофлота» Сергей Александровский на Восточном экономическом форуме (ВЭФ). Поставки первых восьми лайнеров намечены на IV квартал 2027 года, еще 10 машин поступят в 2028 году. Перевозчик готовит к подписанию с Объединенной авиастроительной корпорацией (ОАК) контракт еще на 90 самолетов. Лизинг и техническое обслуживание полностью возьмет на себя производитель.

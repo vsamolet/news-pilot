@@ -3,9 +3,9 @@ title: "OpenAI отложила выход на IPO из-за проблем с 
 lead: "Компания OpenAI, разработчик ИИ-модели ChatGPT, не будет проводить IPO в 2026 году из-за вопросов безопасности, сообщил глава компании Сэм Альтман."
 pubDate: 2026-09-15T06:03:31.000Z
 category: tech
-image: /images/openai-otlozhila-vyhod-na-ipo-iz-za-problem-s-bezopasnostyu.webp
-image_credit: "Andrew Neel"
-image_credit_url: "https://unsplash.com/@andrewtneel?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1581093048991-c10e72e009e3?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE0MTY1fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "ThisisEngineering"
+image_credit_url: "https://unsplash.com/@thisisengineering?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8953540"
 ---
 Сэм Альтман, глава OpenAI, заявил журналу Fortune, что компания не будет спешить с выходом на IPO и текущий момент не подходит для этого из-за проблем с безопасностью. Он также отметил, что OpenAI изучает вопросы безопасности ИИ и готова приостановить обучение своих моделей для достижения большего контроля над их работой.

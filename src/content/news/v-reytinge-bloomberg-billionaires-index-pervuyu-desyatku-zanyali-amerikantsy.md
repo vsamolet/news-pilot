@@ -3,9 +3,9 @@ title: "В рейтинге Bloomberg Billionaires Index первую десят
 lead: "По версии Bloomberg Billionaires Index на 11 сентября, в первой десятке рейтинга богатейших людей мира оказались только американцы."
 pubDate: 2026-09-14T06:03:42.000Z
 category: business
-image: /images/v-reytinge-bloomberg-billionaires-index-pervuyu-desyatku-zanyali-amerikantsy.webp
-image_credit: "Brecht Corbeel"
-image_credit_url: "https://unsplash.com/@brechtcorbeel?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1758691736580-a41e0cfe9e9f?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE2NzA5fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Vitaly Gariev"
+image_credit_url: "https://unsplash.com/@silverkblack?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.vedomosti.ru/business/news/2026/09/11/1228156-amerikantsi-zanyali"
 ---
 Как сообщает «Ведомости», в рейтинге богатейших людей мира Bloomberg Billionaires Index по версии на 11 сентября остались только американцы, связанные преимущественно с технологической отраслью. Первое место сохранил основатель Tesla и SpaceX Илон Маск с состоянием $919 млрд. За ним следуют сооснователь Google Ларри Пейдж с $286 млрд и основатель Amazon Джефф Безос с $274 млрд. Четвертое место занимает сооснователь Google Сергей Брин ($266 млрд), пятое – основатель Dell Майкл Делл ($245 млрд). Замыкает десятку глава Berkshire Hathaway Уоррен Баффетт с состоянием $144 млрд. Он стал единственным участником топ-10, которого Bloomberg относит не к технологической отрасли, а к диверсифицированному бизнесу.

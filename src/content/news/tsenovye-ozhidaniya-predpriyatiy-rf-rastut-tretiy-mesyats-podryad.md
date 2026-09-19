@@ -3,9 +3,9 @@ title: "Ценовые ожидания предприятий РФ растут
 lead: "Ценовые ожидания российских предприятий в сентябре продолжают увеличиваться."
 pubDate: 2026-09-13T12:03:01.000Z
 category: economics
-image: /images/tsenovye-ozhidaniya-predpriyatiy-rf-rastut-tretiy-mesyats-podryad.webp
-image_credit: "Yusuf Onuk"
-image_credit_url: "https://unsplash.com/@onkysf?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1770461846516-b7e5993a8e4f?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE2MTU3fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "David Vives"
+image_credit_url: "https://unsplash.com/@davidvives?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8941311"
 ---
 Согласно результатам опроса Банка России, опубликованным 10 сентября, ценовые ожидания предприятий РФ в сентябре растут третий месяц подряд. Баланс таких ожиданий бизнеса на ближайшие три месяца увеличился с 20,5 пункта в июле до 21,1 в августе и 22,7 пункта в сентябре. Ожидаемые предприятиями темпы роста отпускных цен в пересчёте на год ускорились с 6,3% до 7%, как сообщает ЦБ. По мнению аналитиков Telegram-канала «Твёрдые цифры», это частично может быть связано с приближением октябрьской индексации тарифов ЖКХ. В розничной торговле и сельском хозяйстве ценовые ожидания предприятий снизились, так как эти сектора наиболее тесно связаны с потребительской инфляцией.

@@ -3,7 +3,9 @@ title: "Объём торгов драгметаллами на Мосбирже
 lead: "В августе 2026 года объём сделок с драгоценными металлами на Московской бирже увеличился в 2,1 раза по сравнению с аналогичным периодом прошлого года и достиг 506,1 миллиарда рублей."
 pubDate: 2026-09-08T05:44:49.000Z
 category: markets
-image: /images/obem-torgov-dragmetallami-na-mosbirzhe-vyros-v-2-1-raza-v-avguste-2026-goda.webp
+image: "https://images.unsplash.com/photo-1762463176417-2c5e63767bd2?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE0MDU0fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Scottsdale Mint"
+image_credit_url: "https://unsplash.com/@scottsdalemint?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.rbc.ru/quote/08/09/2026/6a9fbd549a79479ddf4413eb"
 ---
 По данным Московской биржи, общий объём торгов драгоценными металлами (золото, серебро, платина, палладий) в августе 2026 года составил 506,1 миллиарда рублей. Это в 2,1 раза превышает показатель августа 2025 года и примерно на 10% выше результата за предыдущий месяц. Как передаёт РБК, максимальный уровень торгов драгметаллами на Мосбирже в 2026 году был зафиксирован в феврале и составил 554,3 миллиарда рублей, следом идёт март с объёмом в 549 миллиардов рублей.

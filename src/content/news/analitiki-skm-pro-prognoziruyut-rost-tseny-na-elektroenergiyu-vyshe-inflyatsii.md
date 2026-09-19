@@ -3,9 +3,9 @@ title: "Аналитики СКМ.ПРО прогнозируют рост це�
 lead: "По оценкам СКМ.ПРО, к 2042 году одноставочная цена на электроэнергию может вырасти в 1,6–1,7 раза по сравнению с инфляцией."
 pubDate: 2026-09-10T18:03:14.000Z
 category: economics
-image: /images/analitiki-skm-pro-prognoziruyut-rost-tseny-na-elektroenergiyu-vyshe-inflyatsii.webp
-image_credit: "Ainur Khakimov"
-image_credit_url: "https://unsplash.com/@ainr?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1770461846516-b7e5993a8e4f?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODExNDk1fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "David Vives"
+image_credit_url: "https://unsplash.com/@davidvives?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8938533"
 ---
 Как сообщает «Коммерсантъ», аналитики СКМ.ПРО предполагают, что к 2042 году одноставочная цена на электроэнергию может составить от 6,45 тыс. до 6,85 тыс. руб. за 1 МВт•ч. Это означает, что рост цены превысит инфляцию в ценах 2026 года в 1,6–1,7 раза. В структуре одноставочной цены доля мощности составит 65%, что отражает вклад в цену оплаты оптовым рынком программы строительства и модернизации электростанций — всего 88,5 ГВт новой мощности. Такие параметры заложены в Генеральную схему размещения объектов электроэнергетики до 2042 года.

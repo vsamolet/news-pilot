@@ -3,7 +3,9 @@ title: "Рост индексов Мосбиржи и РТС зафиксиро�
 lead: "8 сентября на российском рынке акций наблюдался рост индексов Мосбиржи и РТС, по состоянию на 12:00 мск."
 pubDate: 2026-09-08T06:03:12.000Z
 category: markets
-image: /images/rost-indeksov-mosbirzhi-i-rts-zafiksirovan-8-sentyabrya.webp
+image: "https://images.unsplash.com/photo-1768242079046-c9c633187db1?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE1MTYxfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Jakub Żerdzicki"
+image_credit_url: "https://unsplash.com/@jakubzerdzicki?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.vedomosti.ru/investments/news/2026/09/08/1227158-rossiiskii-rinok-aktsii"
 ---
 По состоянию на 12:00 мск 8 сентября индекс Мосбиржи вырос по отношению к закрытию предыдущего дня на 0,36% и составил 2 273,81. Индекс РТС также показал рост на 0,36%, достигнув отметки 831,06. Лидерами роста цен на торгах Мосбиржи стали акции компаний «ЭсЭфАй», «Сегежа», «Русгидро», «Селигдар» и «Группа Астра». Среди них акции «ЭсЭфАй» выросли на 4% до 620,80 рублей, «Сегежа» — на 3,25% до 0,73 рублей, «Русгидро» — на 2,18% до 0,38 рублей, «Селигдар» — на 1,24% до 35,13 рублей, а «Группа Астра» — на 0,92% до 218,55 рублей.

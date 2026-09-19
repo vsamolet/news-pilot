@@ -3,9 +3,9 @@ title: "АТЭР предложила маркетплейсам использ�
 lead: "Ассоциация торговой недвижимости и экспертов ритейла (АТЭР) обратилась к крупнейшим маркетплейсам с предложением использовать торговые центры в качестве распределительных пунктов."
 pubDate: 2026-09-10T06:03:48.000Z
 category: business
-image: /images/ater-predlozhila-marketpleysam-ispolzovat-torgovye-tsentry-kak-logisticheskuyu-infrastrukturu.webp
-image_credit: "Luna Wang"
-image_credit_url: "https://unsplash.com/@lunawangjl?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1715059120691-d6b06c275d74?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODExODI3fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Jakub Żerdzicki"
+image_credit_url: "https://unsplash.com/@jakubzerdzicki?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8938392"
 ---
 Ассоциация торговой недвижимости и экспертов ритейла (АТЭР) предложила онлайн-площадкам использовать торговые центры как распределительно-логистическую инфраструктуру. С таким предложением АТЭР обратилась к Ozon, Wildberries, «Яндекс Маркету» и другим площадкам. Инициатива уже представлена в рамках рабочей группы с маркетплейсами, созданной на площадке Минпромторга России.

@@ -3,9 +3,9 @@ title: "Рост цен на металлургический уголь на а
 lead: "Цены на металлургический уголь на азиатских рынках увеличились на треть с начала года."
 pubDate: 2026-09-16T06:03:21.000Z
 category: markets
-image: /images/rost-tsen-na-metallurgicheskiy-ugol-na-aziatskih-rynkah.webp
-image_credit: "Galt Museum & Archives"
-image_credit_url: "https://unsplash.com/@galtmuseum?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1774946103680-3d34a461a581?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE1MzgyfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "UZ Creative Services"
+image_credit_url: "https://unsplash.com/@p8lm_k5vq2rx?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8953827"
 ---
 Нарастающий дефицит металлургического угля на азиатских рынках повышает интерес к российскому сырью. В первую неделю сентября цены на условиях FOB Дальний Восток достигли 176 долларов за тонну, увеличившись на треть с начала года. Была заключена сделка на поставку 40 тысяч тонн российского угля марки К в Китай по 267 долларов за тонну.

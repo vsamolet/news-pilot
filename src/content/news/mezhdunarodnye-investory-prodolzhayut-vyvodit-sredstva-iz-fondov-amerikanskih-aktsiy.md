@@ -3,9 +3,9 @@ title: "Международные инвесторы продолжают вы�
 lead: "За неделю, закончившуюся 9 сентября, из фондов американских акций был выведен 3,9 миллиарда долларов."
 pubDate: 2026-09-15T18:03:12.000Z
 category: markets
-image: /images/mezhdunarodnye-investory-prodolzhayut-vyvodit-sredstva-iz-fondov-amerikanskih-aktsiy.webp
-image_credit: "Austin Distel"
-image_credit_url: "https://unsplash.com/@austindistel?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1774946103680-3d34a461a581?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODEzNzIyfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "UZ Creative Services"
+image_credit_url: "https://unsplash.com/@p8lm_k5vq2rx?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8953687"
 ---
 Согласно данным Emerging Portfolio Fund Research (EPFR), международные инвесторы продолжают сокращать вложения в фонды акций американских компаний. Как сообщает «Коммерсантъ», за неделю, закончившуюся 9 сентября, клиенты таких фондов вывели 3,9 миллиарда долларов. Это на 2 миллиарда долларов меньше потерь неделей ранее, но текущая неделя стала третьей подряд, когда инвесторы забирают деньги. В сумме потери фондов составили 14,2 миллиарда долларов.

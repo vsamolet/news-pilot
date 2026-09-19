@@ -3,9 +3,9 @@ title: "Вице-премьер РФ Дмитрий Патрушев заяви�
 lead: "Россия является одним из основных поставщиков продовольствия на мировой рынок, заявил вице-премьер РФ Дмитрий Патрушев на Международном фестивале молодёжи в Екатеринбурге."
 pubDate: 2026-09-18T18:03:19.000Z
 category: economics
-image: /images/vitse-premer-rf-dmitriy-patrushev-zayavil-o-roli-rossii-kak-klyuchevogo-postavschika-prodovolstviya.webp
-image_credit: "Hendrik Schuette"
-image_credit_url: "https://unsplash.com/@hayek5?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1647054451013-1ffafb654e5c?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE3MjYyfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Chaz McGregor"
+image_credit_url: "https://unsplash.com/@chazmcgregor?utm_source=marketsco&utm_medium=referral"
 source_url: "https://iz.ru/2167323/2026-09-15/patrushev-nazval-rossiiu-odnim-iz-kliuchevykh-postavshchikov-prodovolstviia-v-mire"
 ---
 Вице-премьер РФ Дмитрий Патрушев подчеркнул, что Россия достигла высокого уровня самообеспеченности по ключевым видам сельхозпродукции и выступает надёжным партнёром для десятков государств. Он отметил, что российский аграрный экспорт составляет порядка 100 млн тонн, а его объём в деньгах превышает 40 млрд долларов.

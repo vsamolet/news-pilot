@@ -3,9 +3,9 @@ title: "Из-за извержения вулкана Анак-Кракатау 
 lead: "Крупнейший аэропорт Индонезии Сукарно-Хатта в Джакарте приостановил работу из-за распространения пепла после извержения вулкана."
 pubDate: 2026-09-08T11:46:48.000Z
 category: society
-image: /images/iz-za-izverzheniya-vulkana-anak-krakatau-aeroport-dzhakarty-priostanovil-rabotu.webp
-image_credit: "You Le"
-image_credit_url: "https://unsplash.com/@le_y0u?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1709560723547-4a14abf2ebe9?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODEyNjAzfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Scott Precious"
+image_credit_url: "https://unsplash.com/@scottsalchemy?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8937400"
 ---
 Аэропорт Джакарты не работает с 1:30 по местному времени 6 сентября (21:30 мск 5 сентября). Изначально ограничения вводили на четыре часа, но позднее их продлили ещё на пять часов. Решение о закрытии аэропорта принимается на основе данных о количестве вулканического пепла в воздухе.

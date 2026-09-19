@@ -3,7 +3,9 @@ title: "Группа «МГКЛ» демонстрирует значитель�
 lead: "За восемь месяцев 2026 года выручка группы «МГКЛ» («Мосгорломбард») выросла в 2,4 раза по сравнению с аналогичным периодом прошлого года."
 pubDate: 2026-09-08T04:01:00.000Z
 category: markets
-image: /images/gruppa-mgkl-demonstriruet-znachitelnyy-rost-vyruchki.webp
+image: "https://images.unsplash.com/photo-1614029896656-a094f640558d?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODEyMzgxfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Tech Daily"
+image_credit_url: "https://unsplash.com/@techdailyca?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.vedomosti.ru/investments/news/2026/09/08/1227105-viruchka-gruppi-mgkl"
 ---
 По прогнозам, выручка группы «МГКЛ» за январь — август 2026 года может достичь 34,3 млрд рублей, что в 2,4 раза больше, чем за аналогичный период 2025 года. Этот показатель также превысит общую выручку группы за весь 2025 год. Как передаёт «Ведомости», количество розничных клиентов группы за восемь месяцев текущего года увеличилось на 6% и достигло 165 300 человек. При этом снизилась доля товаров, находящихся в портфеле более 90 дней: по итогам января — августа она составила 2,2% против 10% за аналогичный период прошлого года.

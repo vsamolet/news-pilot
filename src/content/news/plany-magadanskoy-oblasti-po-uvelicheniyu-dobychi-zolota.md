@@ -3,7 +3,9 @@ title: "Магаданская область планирует увеличи�
 lead: "Власти Магаданской области намерены значительно увеличить добычу золота в регионе."
 pubDate: 2026-09-08T04:00:55.000Z
 category: economics
-image: /images/plany-magadanskoy-oblasti-po-uvelicheniyu-dobychi-zolota.webp
+image: "https://images.unsplash.com/photo-1763854021545-a92b3658fa9a?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE0Mzg2fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Phil Hearing"
+image_credit_url: "https://unsplash.com/@philhearing?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.rbc.ru/rbcfreenews/6a980aeb2899f9ff401477fc"
 ---
 Магаданская область ставит перед собой амбициозную цель — увеличить добычу золота до более чем 80 тонн в год в течение пяти лет. Это заявление было сделано в рамках обсуждения перспектив развития горнодобывающей отрасли в регионе.

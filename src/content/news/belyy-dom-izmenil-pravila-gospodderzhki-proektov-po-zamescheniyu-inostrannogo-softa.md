@@ -3,9 +3,9 @@ title: "Белый дом изменил правила господдержки
 lead: "Правительство скорректировало порядок отбора особо значимых проектов (ОЗП) по разработке отечественных ИТ-решений."
 pubDate: 2026-09-13T18:02:54.000Z
 category: tech
-image: /images/belyy-dom-izmenil-pravila-gospodderzhki-proektov-po-zamescheniyu-inostrannogo-softa.webp
-image_credit: "Growtika"
-image_credit_url: "https://unsplash.com/@growtika?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1784821856280-401b76b03266?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODEyMDQ5fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Brecht Corbeel"
+image_credit_url: "https://unsplash.com/@brechtcorbeel?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8941305"
 ---
 Как сообщает «Коммерсантъ», правительство утвердило новый порядок отбора особо значимых проектов (ОЗП) по разработке и внедрению отечественных ИТ-решений, замещающих иностранное программное обеспечение. Скорректированные правила будут применяться в ходе следующего отбора заявок в рамках работы индустриальных центров компетенций. Ожидается, что новый этап отбора стартует в ближайшее время.

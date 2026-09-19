@@ -3,7 +3,9 @@ title: "Московская биржа запустила торги новым
 lead: "На срочном рынке Московской биржи начались торги десятью новыми вечными фьючерсами на акции компаний США."
 pubDate: 2026-09-08T06:31:49.000Z
 category: markets
-image: /images/moskovskaya-birzha-zapustila-torgi-novymi-vechnymi-fyuchersami-na-aktsii-amerikanskih-kompaniy.webp
+image: "https://images.unsplash.com/photo-1774866563441-26c5d016163e?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODEzODMzfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Mark Ashford"
+image_credit_url: "https://unsplash.com/@ashforma?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.vedomosti.ru/investments/news/2026/09/08/1227166-torgi-vechnimi-fyuchersami"
 ---
 Московская биржа сообщила о начале торгов десятью новыми вечными фьючерсами на акции американских компаний. Вечные фьючерсы представляют собой контракты без даты экспирации, позволяющие удерживать позицию в течение любого удобного срока. Новые контракты дают возможность участвовать в динамике цен акций американских компаний без их прямой покупки и владения.

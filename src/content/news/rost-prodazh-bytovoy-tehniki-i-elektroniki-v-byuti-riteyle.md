@@ -3,9 +3,9 @@ title: "Рост продаж бытовой техники и электрон�
 lead: "В первом полугодии 2026 года продажи малой бытовой техники и электроники в бьюти-ритейлере «Золотое яблоко» значительно выросли."
 pubDate: 2026-09-09T12:03:30.000Z
 category: business
-image: /images/rost-prodazh-bytovoy-tehniki-i-elektroniki-v-byuti-riteyle.webp
-image_credit: "Adeel Ahmed"
-image_credit_url: "https://unsplash.com/@aadii2050?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1784914179349-fd23459c7326?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE1MjcyfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Julia Taubitz"
+image_credit_url: "https://unsplash.com/@justmejuliee?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8937652"
 ---
 По данным «Коммерсанта», продажи российских брендов техники в сети «Золотое яблоко» выросли на 37% в денежном выражении и на 19% в физическом по сравнению с аналогичным периодом прошлого года. Среди наиболее популярных товаров — наушники и колонки, продажи которых выросли в 3,1 раза в денежном выражении и в 2,8 раза в штуках. Средний чек в сегменте техники увеличился почти на 15%. За два года продажи техники в сети выросли в 4,3 раза в денежном выражении и в три раза в физическом. Эксперты связывают рост с удобством цифровой витрины ритейлеров и относительной простотой хранения и реализации малой бытовой техники. Представители сети отмечают конкурентные цены и рост качества российских брендов как ключевые факторы спроса. 

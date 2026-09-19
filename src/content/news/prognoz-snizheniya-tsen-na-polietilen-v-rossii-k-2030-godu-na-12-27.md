@@ -3,9 +3,9 @@ title: "Прогноз снижения цен на полиэтилен в Ро
 lead: "Согласно обзору Arthur Consulting, цены на полиэтилен в России могут снизиться на 12–27% к 2030 году вслед за котировками в Китае."
 pubDate: 2026-09-16T18:03:28.000Z
 category: economics
-image: /images/prognoz-snizheniya-tsen-na-polietilen-v-rossii-k-2030-godu-na-12-27.webp
-image_credit: "Kelvin Zyteng"
-image_credit_url: "https://unsplash.com/@zyteng?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1693406257159-24af9ac5a636?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE0ODI5fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Mony Misheal"
+image_credit_url: "https://unsplash.com/@nikonprophoto?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8953822"
 ---
 Как пишет «Коммерсантъ», стоимость полиэтилена в России может снизиться к 2030 году на 12–27%, следуя за ценами в Китае. Эксперты Arthur Consulting отмечают, что цены на полиолефины в РФ зависят от уровня цен в КНР и динамики цен на нефть (корреляция — 96%). Прогноз включает три сценария, учитывающие динамику котировок нефти и планы Китая по строительству новых мощностей. В зависимости от реализации этих параметров, цена на полиэтилен в Китае может снизиться с $705 за тонну в начале 2026 года до $510–620 за тонну в 2030 году, а в России — с $1100 до $775–970 за тонну.

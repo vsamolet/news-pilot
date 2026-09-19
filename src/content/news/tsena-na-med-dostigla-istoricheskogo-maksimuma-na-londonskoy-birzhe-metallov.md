@@ -3,7 +3,9 @@ title: "Цена на медь достигла исторического ма�
 lead: "Цена на медь выросла до рекордных $14 617 за тонну на фоне ожиданий введения пошлин на импорт рафинированного металла со стороны США."
 pubDate: 2026-09-08T06:14:46.000Z
 category: economics
-image: /images/tsena-na-med-dostigla-istoricheskogo-maksimuma-na-londonskoy-birzhe-metallov.webp
+image: "https://images.unsplash.com/photo-1645536569897-565afe74ee02?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE2MDQ2fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Karyna Panchenko"
+image_credit_url: "https://unsplash.com/@karyna_panchenko?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.vedomosti.ru/investments/news/2026/09/08/1227152-tsena-na-med"
 ---
 Цена на медь на Лондонской бирже металлов (LME) достигла исторического максимума, превысив $14 584 за тонну. По состоянию на 11:45 мск трехмесячные фьючерсы на медь выросли на 0,5%, а за год медь подорожала почти на 17%. Как передает «Ведомости», агентство Bloomberg объясняет рост цен долгосрочным несоответствием между ограниченными поставками с рудников и растущим спросом со стороны центров обработки данных, производителей оборудования для возобновляемых источников энергии и электросетей.

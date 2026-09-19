@@ -3,9 +3,9 @@ title: "Заместитель руководителя администраци
 lead: "Заместитель руководителя администрации президента РФ Максим Орешкин заявил, что рост доходов граждан в России имеет устойчивую динамику и продолжится в ближайшие годы."
 pubDate: 2026-09-17T18:03:46.000Z
 category: economics
-image: /images/zamestitel-rukovoditelya-administratsii-prezidenta-rf-zayavil-o-sohranenii-dinamiki-rosta-zarplat.webp
-image_credit: "rupixen"
-image_credit_url: "https://unsplash.com/@rupixen?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1574607408180-3b72da2969bb?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE4NDMwfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Annie Spratt"
+image_credit_url: "https://unsplash.com/@anniespratt?utm_source=marketsco&utm_medium=referral"
 source_url: "https://iz.ru/2166611/2026-09-14/oreshkin-zaiavil-o-sokhranenii-dinamiki-povysheniia-zarplat-v-rf"
 ---
 Максим Орешкин подчеркнул, что рост зарплат в последние годы есть и будет сохраняться. Он отметил, что обилие выходных и праздничных дней в календаре не препятствует развитию экономики и увеличению ВВП. Орешкин считает, что без полноценного отдыха эффективная трудовая деятельность невозможна. Ключевой задачей властей на среднесрочную перспективу остается повышение производительности, чтобы позитивные экономические изменения ощутил каждый житель страны.

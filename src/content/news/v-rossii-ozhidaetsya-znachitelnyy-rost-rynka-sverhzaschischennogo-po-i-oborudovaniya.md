@@ -3,10 +3,10 @@ title: "В России ожидается значительный рост р�
 lead: "По данным дорожной карты «Сейфнет» Национальной технологической инициативы, к 2030 году российский рынок решений на основе конструктивной безопасности может увеличиться в восемь раз."
 pubDate: 2026-09-18T12:03:28.000Z
 category: economics
-image: /images/v-rossii-ozhidaetsya-znachitelnyy-rost-rynka-sverhzaschischennogo-po-i-oborudovaniya.webp
+image: "https://images.unsplash.com/photo-1690907323808-84f5441cc6f4?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE2ODIwfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
 format: analytics
-image_credit: "Florian Krumm"
-image_credit_url: "https://unsplash.com/@floriankrumm?utm_source=delovoy-vestnik&utm_medium=referral"
+image_credit: "Shreyashka Maharjan"
+image_credit_url: "https://unsplash.com/@shreyashka?utm_source=marketsco&utm_medium=referral"
 source_url: "https://iz.ru/2167031/2026-09-15/rynok-sverkhzashchishchennogo-po-i-oborudovaniia-v-rf-mozhet-vyrasti-v-vosem-raz-k-2030-godu"
 ---
 Согласно дорожной карте «Сейфнет», разработанной рабочей группой Национальной технологической инициативы (НТИ), российский рынок решений на основе конструктивной безопасности может вырасти с 3 млрд рублей в 2026 году до 25 млрд рублей к 2030 году. Документ предусматривает развитие криптографической защиты, доверенных аппаратных средств и отечественной электронной компонентной базы.

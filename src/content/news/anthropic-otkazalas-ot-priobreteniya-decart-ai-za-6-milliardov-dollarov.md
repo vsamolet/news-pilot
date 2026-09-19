@@ -3,7 +3,9 @@ title: "Anthropic отказалась от приобретения Decart AI �
 lead: "Американская компания Anthropic отказалась от покупки израильского ИИ-стартапа Decart AI, сообщает Bloomberg."
 pubDate: 2026-09-08T06:25:56.000Z
 category: tech
-image: /images/anthropic-otkazalas-ot-priobreteniya-decart-ai-za-6-milliardov-dollarov.webp
+image: "https://images.unsplash.com/photo-1581094653589-70923c3a198e?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODExNzE2fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "ThisisEngineering"
+image_credit_url: "https://unsplash.com/@thisisengineering?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8938830"
 ---
 Американская компания Anthropic, специализирующаяся на разработках в области искусственного интеллекта, отказалась от приобретения израильского ИИ-стартапа Decart AI. Переговоры о сделке начались в августе, и интерес Anthropic к израильской компании был вызван разработанной Decart AI технологией повышения эффективности вычислительных ресурсов при обучении нейросетей. Эксперты отмечали, что эта технология могла бы помочь снизить операционные расходы Anthropic.

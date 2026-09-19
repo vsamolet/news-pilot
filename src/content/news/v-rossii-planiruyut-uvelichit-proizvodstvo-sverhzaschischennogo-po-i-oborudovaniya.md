@@ -3,9 +3,9 @@ title: "В России планируют увеличить производс
 lead: "Власти РФ стремятся увеличить рынок отечественного программного обеспечения и IT-оборудования, защищенного от взлома, в восемь раз к 2030 году. Это предусмотрено дорожной картой «Сейфнет» Национальной технологической инициативы."
 pubDate: 2026-09-18T06:03:21.000Z
 category: tech
-image: /images/v-rossii-planiruyut-uvelichit-proizvodstvo-sverhzaschischennogo-po-i-oborudovaniya.webp
+image: "https://images.unsplash.com/photo-1782330136002-718e61efb760?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE2OTMxfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
 image_credit: "Brecht Corbeel"
-image_credit_url: "https://unsplash.com/@brechtcorbeel?utm_source=delovoy-vestnik&utm_medium=referral"
+image_credit_url: "https://unsplash.com/@brechtcorbeel?utm_source=marketsco&utm_medium=referral"
 source_url: "https://iz.ru/2166710/valerii-kodachigov/v-rf-khotiat-narastit-vypusk-bezopasnogo-po-i-oborudovaniia"
 ---
 Согласно дорожной карте развития рынка решений на основе конструктивной безопасности, его объём может вырасти с 3 млрд рублей в 2026 году до 25 млрд к 2030-му. Документ предусматривает развитие криптографической защиты, доверенных аппаратных средств и отечественной электронной компонентной базы. Число компаний, выпускающих IT-решения в сфере конструктивной безопасности, планируется увеличить с пяти до 50.

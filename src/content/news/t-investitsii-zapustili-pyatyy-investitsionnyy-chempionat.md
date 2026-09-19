@@ -3,7 +3,9 @@ title: "«Т-Инвестиции» запустили пятый инвести
 lead: "Компания «Т-Инвестиции» объявила о старте пятого инвестиционного чемпионата, который пройдёт с 7 сентября по 27 ноября."
 pubDate: 2026-09-08T05:35:08.000Z
 category: markets
-image: /images/t-investitsii-zapustili-pyatyy-investitsionnyy-chempionat.webp
+image: "https://images.unsplash.com/photo-1781364486016-d83c39eb87f2?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE1NzE1fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Yanping Ma"
+image_credit_url: "https://unsplash.com/@maro_of_sengu?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.rbc.ru/radio/08/09/2026/6a9fc5439a79471f250d901b"
 ---
 Компания «Т-Инвестиции» запустила пятый инвестиционный чемпионат. За предыдущие четыре сезона в соревнованиях приняли участие более 400 тысяч человек, между которыми было разыграно 510 миллионов рублей. Призовой фонд нынешнего чемпионата составляет 100 миллионов рублей.

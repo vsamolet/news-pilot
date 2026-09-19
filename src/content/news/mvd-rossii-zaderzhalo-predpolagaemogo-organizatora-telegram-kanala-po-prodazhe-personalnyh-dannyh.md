@@ -3,7 +3,9 @@ title: "МВД России пресекло деятельность Telegram-�
 lead: "Сотрудники МВД России задержали предполагаемого организатора Telegram-канала, через который осуществлялась продажа персональных и конфиденциальных данных из баз банков, операторов связи и госорганов."
 pubDate: 2026-09-08T05:27:15.000Z
 category: society
-image: /images/mvd-rossii-zaderzhalo-predpolagaemogo-organizatora-telegram-kanala-po-prodazhe-personalnyh-dannyh.webp
+image: "https://images.unsplash.com/photo-1773433360391-9ae08cf87b4a?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODEzOTQzfA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Margaret Giatras"
+image_credit_url: "https://unsplash.com/@margaretann110?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.rbc.ru/society/08/09/2026/6a9fc57ca240d3be76afc1ba"
 ---
 Официальный представитель МВД России Ирина Волк сообщила о пресечении работы Telegram-канала, через который продавались персональные данные, а также сведения из баз операторов связи, банков и органов исполнительной власти. Сотрудники управления по борьбе с киберпреступностью МВД России установили личность и задержали предполагаемого организатора канала.

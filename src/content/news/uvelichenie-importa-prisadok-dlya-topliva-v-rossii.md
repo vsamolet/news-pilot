@@ -3,9 +3,9 @@ title: "Увеличение импорта присадок для топлив
 lead: "На фоне роста спроса со стороны автомобилистов и сокращения внутреннего производства Россия увеличила импорт присадок для улучшения качества топлива."
 pubDate: 2026-09-19T06:04:23.000Z
 category: economics
-image: /images/uvelichenie-importa-prisadok-dlya-topliva-v-rossii.webp
-image_credit: "Danny Burke"
-image_credit_url: "https://unsplash.com/@djburkephotography?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1780863170480-8b4db1291968?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE2Mzc4fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Bernd 📷 Dittrich"
+image_credit_url: "https://unsplash.com/@hdbernd?utm_source=marketsco&utm_medium=referral"
 source_url: "https://iz.ru/2167631/2026-09-15/rossiia-narastila-import-prisadok-dlia-topliva-na-fone-vysokogo-sprosa"
 ---
 В России зафиксирован рост импорта присадок для топлива, что связано с увеличением спроса на 10–30% и снижением внутреннего производства. Как пишет «Известия», начались регулярные поставки метил-трет-бутилового эфира (МТБЭ), который используется для повышения октанового числа бензинов АИ-95 и АИ-98, а также в нефтехимии, органическом синтезе и фармацевтике.

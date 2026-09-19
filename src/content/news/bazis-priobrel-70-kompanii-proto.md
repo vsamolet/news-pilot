@@ -3,9 +3,9 @@ title: "«Базис» приобрёл 70% компании Proto"
 lead: "Российский разработчик ПО «Базис» купил 70% в ООО «ПротоСервисез» (бренд Proto)."
 pubDate: 2026-09-09T06:03:43.000Z
 category: tech
-image: /images/bazis-priobrel-70-kompanii-proto.webp
+image: "https://images.unsplash.com/photo-1782330136040-533166d0c792?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODExOTM4fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
 image_credit: "Brecht Corbeel"
-image_credit_url: "https://unsplash.com/@brechtcorbeel?utm_source=delovoy-vestnik&utm_medium=referral"
+image_credit_url: "https://unsplash.com/@brechtcorbeel?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8937674"
 ---
 Как сообщает «Коммерсантъ», российский разработчик ПО «Базис» приобрел долю в размере 70% в ООО «ПротоСервисез» (бренд Proto), специализирующейся на разработке платформы для наблюдаемости и анализа IT-систем. Сумма сделки не разглашается. После завершения сделки ООО «ПротоСервисез» станет дочерней компанией группы «Базис», а её финансовые результаты будут включены в отчётность группы.

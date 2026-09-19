@@ -3,9 +3,9 @@ title: "Stellar Group начала производство изотоников
 lead: "Крупный производитель алкоголя Stellar Group вышел на рынок изотоников — спортивных безалкогольных напитков."
 pubDate: 2026-09-17T06:03:44.000Z
 category: business
-image: /images/stellar-group-nachala-proizvodstvo-izotonikov.webp
-image_credit: "Barney Goodman"
-image_credit_url: "https://unsplash.com/@bgoodpic?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1786456629213-d087d121044f?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE1NjA0fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "MChe Lee"
+image_credit_url: "https://unsplash.com/@mclee?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8954762"
 ---
 Как сообщает «Коммерсантъ», Stellar Group, известный производитель алкогольных напитков, начал выпуск изотоников. Первая партия составит около 600 тысяч бутылок. По словам директора по продажам Stellar Group Александра Гревцова, компания планирует поставлять продукцию в фитнес-клубы и сети спортивных товаров. Если продажи окажутся успешными, Stellar Group планирует начать обсуждение с ритейлерами о выводе своих изотоников в классические продуктовые магазины.

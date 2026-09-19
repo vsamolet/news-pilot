@@ -3,9 +3,9 @@ title: "Первый энергоблок АЭС «Аккую» в Турции 
 lead: "Глава Минэнерго Турции Алпарслан Байрактар сообщил о планах запустить первый энергоблок АЭС «Аккую» до конца 2026 года."
 pubDate: 2026-09-08T12:04:13.000Z
 category: business
-image: /images/pervyy-energoblok-aes-akkuyu-v-turtsii-planiruyut-zapustit-do-kontsa-2026-goda.webp
-image_credit: "Joshua Kettle"
-image_credit_url: "https://unsplash.com/@joshuakettle?utm_source=delovoy-vestnik&utm_medium=referral"
+image: "https://images.unsplash.com/photo-1775567291821-a0edcff11b72?ixid=M3wxMDU5MjcwfDB8MXxyYW5kb218fHx8fHx8fHwxNzg5ODE0Mjc2fA&ixlib=rb-4.1.0&auto=format&fit=crop&w=1200&q=80"
+image_credit: "Elena Golubeva"
+image_credit_url: "https://unsplash.com/@elenagolubeva?utm_source=marketsco&utm_medium=referral"
 source_url: "https://www.kommersant.ru/doc/8937436"
 ---
 Первый блок турецкой атомной электростанции (АЭС) «Аккую» начнет работу до конца 2026 года, сообщил глава Минэнерго Турции Алпарслан Байрактар. АЭС «Аккую», строительство которой началось в 2018 году, будет состоять из четырех энергоблоков с реакторами российского дизайна ВВЭР-1200. По словам министра, на первом энергоблоке, каждый из реакторов которого имеет установленную мощность 1,2 тыс. МВт, начался этап испытаний. После ввода первого блока в эксплуатацию около 2–2,5% потребности Турции в электроэнергии будет покрываться за счет атомной энергии, а после ввода всех четырех блоков этот показатель достигнет 10%. Также планируется создать центр обработки данных вместе с третьим и четвертым энергоблоками на «Аккую». Как сообщает Коммерсантъ, строительство АЭС осуществляет АО «Аккую Нуклеар», дочерняя компания «Росатома».
