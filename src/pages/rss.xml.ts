@@ -16,6 +16,23 @@ function toRFC822(date: Date): string {
   return date.toUTCString().replace('GMT', '+0000');
 }
 
+function imageMimeType(path: string): string {
+  const ext = path.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'webp':
+      return 'image/webp';
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg';
+    case 'png':
+      return 'image/png';
+    case 'svg':
+      return 'image/svg+xml';
+    default:
+      return 'image/webp';
+  }
+}
+
 export const GET: APIRoute = async ({ site }) => {
   const siteUrl = site ?? new URL('https://marketsco.ru');
   const entries = (await getCollection('news')).sort(
@@ -36,7 +53,7 @@ export const GET: APIRoute = async ({ site }) => {
       <pubDate>${toRFC822(entry.data.pubDate)}</pubDate>
       <category>${escapeXml(categoryLabel(entry.data.category))}</category>
       <description><![CDATA[${entry.data.lead}]]></description>
-      <enclosure url="${escapeXml(imageUrl)}" type="image/svg+xml" length="0" />
+      <enclosure url="${escapeXml(imageUrl)}" type="${imageMimeType(entry.data.image)}" length="0" />
       <yandex:full-text><![CDATA[${fullTextHtml}]]></yandex:full-text>
     </item>`;
     })
