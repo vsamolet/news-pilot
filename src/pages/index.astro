@@ -25,29 +25,35 @@ const recentPriorityNews = allNews.filter(
 
 const featured = recentPriorityNews[0] ?? allNews[0];
 
-// Единый набор занятых ID — каждый следующий блок ниже выбирает материалы
-// только из того, что ещё не показано выше по странице (кроме сайдбара
-// «Главное коротко»: это компактный тикер, лёгкое пересечение с основной
-// лентой для него нормально, как на реальных новостных сайтах).
+// Единый пул уже показанных статей — КАЖДЫЙ блок ниже, включая оба
+// сайдбара, выбирает материалы только из того, что ещё не занято выше.
+// Ни одна статья не должна появиться на главной дважды. Порядок отбора
+// соответствует порядку блоков на странице по важности:
+// Главная тема -> Акценты дня -> Контекст и тренды -> Главные новости ->
+// Главное коротко -> Картина дня / Молнии.
 const usedIds = new Set([featured.id]);
-
-// Спецблок «Аналитика»: последние 3 материала format:'analytics', не считая
-// уже показанного в hero. Если таких статей пока нет — секция просто не
-// рендерится (см. условие ниже), без «дыры» на странице.
-const analyticsItems = allNews.filter((e) => e.data.format === 'analytics' && !usedIds.has(e.id)).slice(0, 3);
-analyticsItems.forEach((e) => usedIds.add(e.id));
 
 const accents = allNews.filter((e) => !usedIds.has(e.id)).slice(0, 3);
 accents.forEach((e) => usedIds.add(e.id));
 
+// Спецблок «Аналитика»: следующие материалы format:'analytics'. Если таких
+// статей пока нет — секция просто не рендерится (см. условие ниже), без
+// «дыры» на странице.
+const analyticsItems = allNews.filter((e) => e.data.format === 'analytics' && !usedIds.has(e.id)).slice(0, 3);
+analyticsItems.forEach((e) => usedIds.add(e.id));
+
 const feedItems = allNews.filter((e) => !usedIds.has(e.id)).slice(0, 6);
+feedItems.forEach((e) => usedIds.add(e.id));
 
-// «Главное коротко»: только материалы format:'brief'. Пока таких статей
-// нет — секция скрывается целиком (см. условие в разметке ниже), без
-// подмены дублем общей ленты.
-const briefItems = allNews.filter((e) => e.data.format === 'brief').slice(0, 5);
+// «Главное коротко»: только материалы format:'brief', ещё не занятые выше.
+// Пока таких статей нет — секция скрывается целиком (см. условие в
+// разметке ниже), без подмены дублем общей ленты.
+const briefItems = allNews.filter((e) => e.data.format === 'brief' && !usedIds.has(e.id)).slice(0, 5);
+briefItems.forEach((e) => usedIds.add(e.id));
 
-const tickerItems = allNews.slice(0, 10);
+// «Картина дня / Молнии»: хронологический тикер из того, что осталось —
+// не пересекается ни с одним блоком выше на странице.
+const tickerItems = allNews.filter((e) => !usedIds.has(e.id)).slice(0, 10);
 
 const featuredDate = featured.data.pubDate.toLocaleDateString('ru-RU', {
   day: 'numeric',
