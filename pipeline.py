@@ -85,8 +85,15 @@ SOURCES: list[dict[str, Any]] = [
     {"name": "РБК", "rss_url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss"},
     {"name": "Коммерсантъ", "rss_url": "https://www.kommersant.ru/RSS/news.xml"},
     {"name": "Ведомости", "rss_url": "https://www.vedomosti.ru/rss/news"},
-    {"name": "ТАСС", "rss_url": "https://tass.ru/rss/v2.xml"},
     {"name": "Известия", "rss_url": "https://iz.ru/xml/rss/economics.xml", "pre_filtered": True},
+    # ТАСС убран (см. историю коммитов): tass.ru отдаёт страницу защиты от ботов
+    # (Servicepipe WAF, JS-редирект) на все проверенные статьи вместо реального
+    # HTML — trafilatura физически нечего извлекать. За всё время работы источника
+    # не было опубликовано ни одной статьи из ТАСС (проверено по истории репозитория).
+    # С переходом кандидатов на сортировку "от новых к старым" его постоянно
+    # проваливающиеся, но самые свежие записи стали съедать почти весь
+    # MAX_ATTEMPTS_PER_RUN на каждом проходе, из-за чего сайт почти перестал
+    # публиковать новости — отсюда и удаление, а не просто down-приоритет.
 ]
 
 ROOT_DIR = Path(__file__).resolve().parent
@@ -308,8 +315,13 @@ def passes_topic_filter(entry: Any) -> bool:
     return _has_any(title + " " + summary, BUSINESS_TEXT_KEYWORDS)
 
 
-REQUEST_TIMEOUT = 20  # жёсткий потолок на ЛЮБОЙ сетевой запрос (requests.get/post) — не больше 20 сек,
-# чтобы перебор нескольких кандидатов из RSS не мог растянуться на много минут (см. MAX_ATTEMPTS_PER_RUN)
+REQUEST_TIMEOUT = 20  # жёсткий потолок на лёгкие сетевые запросы (RSS/HTML/Unsplash) —
+# не больше 20 сек, чтобы перебор нескольких кандидатов из RSS не мог растянуться на
+# много минут (см. MAX_ATTEMPTS_PER_RUN).
+YANDEX_GPT_TIMEOUT = 45  # отдельный, более щедрый таймаут именно для генерации рерайта:
+# структурированный JSON на 1200-1800 знаков — задача тяжелее лёгких запросов выше, и
+# 20 сек периодически не хватало (см. фактические Read timed out в проде), из-за чего
+# кандидат с уже успешно извлечённым текстом первоисточника терялся впустую.
 DEFAULT_INTERVAL_SECONDS = 15 * 60  # 15 минут
 
 # --- История обработанных ссылок --------------------------------------------
@@ -641,7 +653,7 @@ def call_yandex_gpt(source_material: str, source_name: str) -> dict[str, str]:
     }
 
     response = requests.post(
-        YANDEXGPT_COMPLETION_URL, headers=headers, json=payload, timeout=REQUEST_TIMEOUT
+        YANDEXGPT_COMPLETION_URL, headers=headers, json=payload, timeout=YANDEX_GPT_TIMEOUT
     )
     response.raise_for_status()
     data = response.json()
