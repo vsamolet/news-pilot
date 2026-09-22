@@ -106,13 +106,20 @@ PUBLISH_LOG_PATH = ROOT_DIR / "publish_log.json"
 CONTENT_DIR = ROOT_DIR / "src" / "content" / "news"
 
 # Сколько статей допускается публиковать за календарный месяц (защита бюджета
-# на YandexGPT/Unsplash). Переопределяется флагом --monthly-limit.
-MONTHLY_ARTICLE_LIMIT = 100
+# на YandexGPT/Unsplash). Переопределяется флагом --monthly-limit. Поднят со
+# 100 до 200 вместе с добавлением доп. слота analytics/brief в run_once —
+# при обычном 1 статье/проход + до 1 доп. статьи/проход месячный объём мог
+# почти удвоиться (см. MAX_ARTICLES_PER_RUN), и старый лимит в 100 исчерпался
+# бы примерно к середине месяца, снова остановив публикации до 1-го числа.
+MONTHLY_ARTICLE_LIMIT = 200
 
-# Сколько статей публикуется максимум за ОДИН проход. Рассчитано под cron из
-# GitHub Actions на 3 запуска в день (06:00, 12:00, 18:00 UTC): 1 статья за
-# проход × 3 прохода/день × ~30 дней ≈ 90 статей/месяц — с запасом укладывается
-# в MONTHLY_ARTICLE_LIMIT. Переопределяется флагом --max-per-run.
+# Сколько статей публикуется максимум за ОДИН проход в ОБЫЧНОМ слоте (без
+# учёта доп. слота analytics/brief, см. MAX_EXTRA_FORMAT_ATTEMPTS_PER_RUN и
+# try_publish_extra_format — тот публикует СВЕРХ этого числа). Рассчитано под
+# cron из GitHub Actions на 3 запуска в день (06:00, 12:00, 18:00 UTC): 1
+# статья за проход × 3 прохода/день × ~30 дней ≈ 90 статей/месяц по обычному
+# слоту, ещё до ~90 по доп. слоту — вместе с запасом укладывается в
+# MONTHLY_ARTICLE_LIMIT = 200. Переопределяется флагом --max-per-run.
 MAX_ARTICLES_PER_RUN = 1
 
 # Сколько КАНДИДАТОВ разрешено пробовать за один проход, независимо от того,
@@ -948,9 +955,26 @@ def build_markdown(
 # --- main -----------------------------------------------------------------------
 
 
-def process_entry(entry: Any, history: set[str]) -> Path:
-    """Обрабатывает одну запись ленты и сохраняет её в history сразу после успеха,
-    чтобы сбой на следующей записи не привёл к повторной публикации этой."""
+class GeneratedArticle:
+    """Результат generate_article_for_entry — статья и картинка уже готовы, но
+    ЕЩЁ НЕ сохранены на диск и запись ленты ещё не отмечена в history. Так
+    вызывающий код успевает решить, публиковать результат или отбросить его
+    (см. try_publish_extra_format), не тратя впустую сгенерированный текст на
+    кандидата, который придётся выбросить."""
+
+    def __init__(self, entry, article, slug, image_path, image_credit, image_credit_url, pub_date):
+        self.entry = entry
+        self.article = article
+        self.slug = slug
+        self.image_path = image_path
+        self.image_credit = image_credit
+        self.image_credit_url = image_credit_url
+        self.pub_date = pub_date
+
+
+def generate_article_for_entry(entry: Any) -> GeneratedArticle:
+    """Генерирует рерайт и подбирает изображение для записи ленты — без
+    сохранения на диск и без отметки в history (см. GeneratedArticle)."""
     source_name = entry.get("source_name") or "источник"
     print(f"Новая новость ({source_name}): {entry.title}\n{entry.link}")
 
@@ -977,17 +1001,97 @@ def process_entry(entry: Any, history: set[str]) -> Path:
     # теперь entry здесь почти всегда реально свежая запись, и её дата честно
     # отражает, когда вышла новость, а не когда мы успели её обработать.
     pub_date = entry_pub_date(entry)
+
+    return GeneratedArticle(entry, article, slug, image_path, image_credit, image_credit_url, pub_date)
+
+
+def persist_article(generated: GeneratedArticle, history: set[str]) -> Path:
+    """Сохраняет уже сгенерированную статью на диск и отмечает её запись
+    ленты обработанной в history/publish_log."""
     filepath = build_markdown(
-        article, slug, image_path, entry.link, pub_date, image_credit, image_credit_url
+        generated.article,
+        generated.slug,
+        generated.image_path,
+        generated.entry.link,
+        generated.pub_date,
+        generated.image_credit,
+        generated.image_credit_url,
     )
 
-    history.add(entry.link)
+    history.add(generated.entry.link)
     save_history(history)
-    append_publish_log(entry.link)
+    append_publish_log(generated.entry.link)
 
     print(f"Готово: {filepath.relative_to(ROOT_DIR)}")
-    print(f"Изображение: {image_path}")
+    print(f"Изображение: {generated.image_path}")
     return filepath
+
+
+def process_entry(entry: Any, history: set[str]) -> Path:
+    """Обрабатывает одну запись ленты и сразу сохраняет результат — обычная
+    публикация вне зависимости от итогового format (основной проход
+    run_once). Сбой не помечает запись обработанной — она будет подхвачена
+    на следующем проходе."""
+    generated = generate_article_for_entry(entry)
+    return persist_article(generated, history)
+
+
+# Сколько кандидатов пробуем под ДОПОЛНИТЕЛЬНЫЙ слот analytics/brief за
+# проход (см. try_publish_extra_format) — отдельный бюджет попыток от
+# основного MAX_ATTEMPTS_PER_RUN, чтобы один проход не мог тратить время/API
+# бюджет неограниченно в поисках подходящего формата.
+MAX_EXTRA_FORMAT_ATTEMPTS_PER_RUN = 5
+EXTRA_FORMAT_TARGETS = {"analytics", "brief"}
+
+
+def try_publish_extra_format(
+    fresh_entries: list[Any],
+    history: set[str],
+    max_attempts: int = MAX_EXTRA_FORMAT_ATTEMPTS_PER_RUN,
+) -> int:
+    """Дополнительный слот СВЕРХ обычной публикации в run_once: отдельно
+    ищет и публикует ОДНУ статью с format 'analytics' или 'brief' — с сайта
+    ушёл запрос на регулярный аналитический/сводочный контент в разделах
+    «Контекст и тренды» / «Главное коротко», а обычный проход публикует
+    первого жизнеспособного кандидата вне зависимости от формата и может
+    месяцами не давать ни одного analytics/brief, если такие кандидаты не
+    оказываются первыми в очереди.
+
+    Кандидат, который сгенерировался, но получил format='news' (или другую
+    ошибку), НЕ сохраняется и НЕ отмечается в history — он останется
+    доступен для обычной публикации в одном из следующих проходов, ничего
+    не потеряно, кроме потраченного на генерацию запроса к YandexGPT."""
+    attempts = 0
+    for entry in fresh_entries:
+        if entry.link in history:
+            continue  # уже опубликован (в т.ч. основным проходом этого же запуска)
+        if attempts >= max_attempts:
+            print(
+                f"Доп. слот analytics/brief: лимит попыток ({max_attempts}) исчерпан — "
+                "без публикации в этом запуске, кандидаты не потеряны."
+            )
+            return 0
+        attempts += 1
+        try:
+            generated = generate_article_for_entry(entry)
+        except Exception as exc:  # noqa: BLE001 — не прерываем поиск из-за одного кандидата
+            print(f"Доп. слот analytics/brief — пропускаю «{entry.get('title', entry.get('link'))}»: {exc}", file=sys.stderr)
+            continue
+
+        got_format = generated.article.get("format")
+        if got_format not in EXTRA_FORMAT_TARGETS:
+            print(
+                f"Доп. слот analytics/brief — «{generated.article['title']}» получила "
+                f"format={got_format!r}, не подходит, пробую следующего кандидата."
+            )
+            continue
+
+        filepath = persist_article(generated, history)
+        print(f"Доп. слот analytics/brief заполнен ({got_format}): {filepath.relative_to(ROOT_DIR)}")
+        return 1
+
+    print("Доп. слот analytics/brief: кандидаты закончились раньше лимита попыток, без публикации в этом запуске.")
+    return 0
 
 
 def run_once(
@@ -995,6 +1099,7 @@ def run_once(
     monthly_limit: int = MONTHLY_ARTICLE_LIMIT,
     max_per_run: int = MAX_ARTICLES_PER_RUN,
     max_attempts: int = MAX_ATTEMPTS_PER_RUN,
+    extra_format_attempts: int = MAX_EXTRA_FORMAT_ATTEMPTS_PER_RUN,
 ) -> int:
     """Один проход: забирает новые (не встречавшиеся в history.json) записи
     ленты и публикует их — но не больше max_per_run за проход, не больше,
@@ -1003,9 +1108,18 @@ def run_once(
     max_attempts кандидатов подряд (жёсткий предел на случай массовых сетевых
     сбоев или отказов модерации — см. MAX_ATTEMPTS_PER_RUN). Ошибка на одной
     записи не прерывает обработку остальных и не помечает её как
-    обработанную — она будет подхвачена на следующем проходе. В любом случае
-    (нашли статью, не нашли, исчерпали лимит попыток) функция возвращается
-    штатно — вызывающий код (main) всегда завершает процесс кодом 0."""
+    обработанную — она будет подхвачена на следующем проходе.
+
+    После основного прохода, если остался месячный бюджет, отдельно пытается
+    заполнить ДОПОЛНИТЕЛЬНЫЙ слот под format 'analytics'/'brief' (см.
+    try_publish_extra_format) — сверх max_per_run, своим бюджетом попыток
+    extra_format_attempts. Так «Контекст и тренды»/«Главное коротко» на
+    главной пополняются каждый прогон, а не только когда такой кандидат
+    случайно оказывается первым в общей очереди.
+
+    В любом случае (нашли статью, не нашли, исчерпали лимит попыток) функция
+    возвращается штатно — вызывающий код (main) всегда завершает процесс
+    кодом 0."""
     published_this_month = count_published_this_month()
     if published_this_month >= monthly_limit:
         print(
@@ -1053,6 +1167,15 @@ def run_once(
             print(f"Пропускаю «{entry.get('title', entry.get('link'))}»: {exc}", file=sys.stderr)
 
     print(f"Опубликовано новых статей: {published}/{attempts} попыток (из {len(fresh_entries)} кандидатов).")
+
+    # Доп. слот analytics/brief — только если после основного прохода ещё
+    # остался месячный бюджет (публикация в этом слоте не учтена в
+    # remaining_budget/max_per_run выше, это СВЕРХ него).
+    if published_this_month + published < monthly_limit:
+        published += try_publish_extra_format(fresh_entries, history, extra_format_attempts)
+    else:
+        print("Доп. слот analytics/brief: месячный лимит исчерпан основным проходом, пропускаю.")
+
     return published
 
 
@@ -1061,16 +1184,18 @@ def run_loop(
     monthly_limit: int = MONTHLY_ARTICLE_LIMIT,
     max_per_run: int = MAX_ARTICLES_PER_RUN,
     max_attempts: int = MAX_ATTEMPTS_PER_RUN,
+    extra_format_attempts: int = MAX_EXTRA_FORMAT_ATTEMPTS_PER_RUN,
 ) -> int:
     print(
         f"Режим цикла: проверяю RSS-ленты каждые {interval} сек. "
-        f"Месячный лимит: {monthly_limit}, лимит за проход: {max_per_run}, лимит попыток: {max_attempts}. "
+        f"Месячный лимит: {monthly_limit}, лимит за проход: {max_per_run}, лимит попыток: {max_attempts}, "
+        f"доп. слот analytics/brief: {extra_format_attempts} попыток. "
         "Остановка — Ctrl+C."
     )
     history = load_history()
     while True:
         try:
-            run_once(history, monthly_limit, max_per_run, max_attempts)
+            run_once(history, monthly_limit, max_per_run, max_attempts, extra_format_attempts)
         except Exception as exc:  # noqa: BLE001 — сбой одной проверки не должен убивать цикл
             print(f"Ошибка при проверке ленты: {exc}", file=sys.stderr)
 
@@ -1118,13 +1243,24 @@ def main() -> int:
         help=f"Максимум кандидатов, которые пробуем за проход, независимо от успеха "
         f"(по умолчанию {MAX_ATTEMPTS_PER_RUN}). Жёсткий предел на случай сетевых сбоев/отказов модерации.",
     )
+    parser.add_argument(
+        "--extra-format-attempts",
+        type=int,
+        default=MAX_EXTRA_FORMAT_ATTEMPTS_PER_RUN,
+        help=f"Максимум кандидатов для ДОПОЛНИТЕЛЬНОГО слота analytics/brief за проход, сверх "
+        f"--max-per-run (по умолчанию {MAX_EXTRA_FORMAT_ATTEMPTS_PER_RUN}). См. try_publish_extra_format.",
+    )
     args = parser.parse_args()
 
     if args.loop:
-        return run_loop(args.interval, args.monthly_limit, args.max_per_run, args.max_attempts_per_run)
+        return run_loop(
+            args.interval, args.monthly_limit, args.max_per_run, args.max_attempts_per_run, args.extra_format_attempts
+        )
 
     history = load_history()
-    run_once(history, args.monthly_limit, args.max_per_run, args.max_attempts_per_run)
+    run_once(
+        history, args.monthly_limit, args.max_per_run, args.max_attempts_per_run, args.extra_format_attempts
+    )
     return 0
 
 
